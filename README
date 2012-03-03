@@ -1,0 +1,21 @@
+Wiggelen
+========
+
+Working with wiggle tracks in Python.
+
+
+Description
+-----------
+
+Wiggelen is a Python library for working with wiggle tracks (WIG files). It
+also provides a command line interface to some of its functionality.
+
+
+Copyright and license
+---------------------
+
+Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
+Copyright (c) 2012 Martijn Vermaat <martijn@vermaat.name>
+Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+
+Licensed under the MIT license, see the LICENSE file.
