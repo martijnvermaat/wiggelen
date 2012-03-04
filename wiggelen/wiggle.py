@@ -15,12 +15,16 @@ import itertools
 from .index import index
 
 
-def walk(track=sys.stdin):
+def walk(track=sys.stdin, regions=None, index=None):
     """
-    Walk over the track and for each position yield the position and value.
+    Walk over the track and yield (region, position, value) triples.
 
     @arg track: Wiggle track.
     @type track: file
+    @arg regions: Optional list of regions to walk, in that order.
+    @type regions: list(str)
+    @arg index: Optional index to use for finding regions.
+    @type index: dict(str, int)
 
     @return: Triples of (region, position, value) per defined position.
     @rtype: generator(str, int, str)
@@ -28,8 +32,18 @@ def walk(track=sys.stdin):
     Todo: Do something with browser and track lines.
     Todo: Better exceptions.
     Todo: Prettify the parsing code.
+    Todo: By default walk the regions from the index in alphabetical order,
+        even if no explicit list of regions is given. This would remove the
+        need for ordered_regions with merge.
     """
     format = region = start = step = span = None
+
+    #Todo: Work with the supplied regions and index.
+    #for region in regions:
+    #    if index:
+    #        track.seek(index[region])
+    #    else:
+    #        # check if we get expected region (possibly skipping empty ones)
 
     for line in track:
         if line.startswith('browser') or line.startswith('track'):

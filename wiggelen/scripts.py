@@ -14,7 +14,7 @@ import argparse
 
 from . import walk, write
 from .merge import merge, mergers
-from .index import index
+from .index import index, ordered_regions
 
 
 def main():
@@ -41,7 +41,10 @@ def main():
     args = parser.parse_args()
 
     if args.subcommand == 'merge':
-        walkers = map(walk, args.tracks)
+        #walkers = map(walk, args.tracks)
+        indices = map(idx, args.tracks)
+        walkers = [walk(track, regions=ordered_regions(*indices), index=idx)
+                   for track, idx in zip(args.tracks, indices)]
         write(merge(*walkers, merger=mergers[args.merger]), track=sys.stdout)
 
     if args.subcommand == 'index':
