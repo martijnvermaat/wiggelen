@@ -12,6 +12,8 @@ Licensed under the MIT license, see the LICENSE file.
 import sys
 import itertools
 
+from .index import index
+
 
 def walk(track=sys.stdin):
     """
@@ -20,37 +22,76 @@ def walk(track=sys.stdin):
     @arg track: Wiggle track.
     @type track: file
 
-    @return: Pairs of (position, value) per defined position.
-    @rtype: generator(int, str)
+    @return: Triples of (region, position, value) per defined position.
+    @rtype: generator(str, int, str)
 
-    Todo: Handle chromosomes.
-    Todo: Handle variable and fixed step.
+    Todo: Do something with browser and track lines.
+    Todo: Better exceptions.
+    Todo: Prettify the parsing code.
     """
+    format = region = start = step = span = None
+
     for line in track:
-        fields = line.split()
-        try:
-            position = int(fields[0])
-            # Todo: Make value of int type if it is an integer
-            value = float(fields[1])
-        except ValueError:
-            continue
-        yield position, value
+        if line.startswith('browser') or line.startswith('track'):
+            pass
+
+        elif line.startswith('variableStep'):
+            try:
+                fields = dict(map(lambda field: field.split('='),
+                                  line[len('variableStep'):].split()))
+                region = fields['chrom']
+                span = fields.get('span', 1)
+                format = 'variable'
+            except ValueError, KeyError:
+                raise Exception('Could not parse line: %s' % line)
+
+        elif line.startswith('fixedStep'):
+            try:
+                fields = dict(map(lambda field: field.split('='),
+                                  line[len('fixedStep'):].split()))
+                region = fields['chrom']
+                start = int(fields['start'])
+                step = int(fields['step'])
+                span = int(fields.get('span', 1))
+                format = 'fixed'
+            except ValueError, KeyError:
+                raise Exception('Could not parse line: %s' % line)
+
+        elif format == 'variable':
+            try:
+                position, value = line.split()
+                position = int(position)
+                value = float(value) if '.' in value else int(value)
+            except ValueError:
+                raise Exception('Could not parse line: %s' % line)
+            for i in range(span):
+                yield region, position + i, value
+
+        elif format == 'fixed':
+            try:
+                value = float(line) if '.' in line else int(line)
+            except ValueError:
+                raise Exception('Could not parse line: %s' % line)
+            for i in range(span):
+                yield region, start + i, value
+            start += step
+
+        else:
+            raise Exception('Could not parse line: %s' % line)
 
 
 def walk_together(*walkers):
     """
     Walk over all tracks simultaneously and for each position yield the
-    position and a list of values for each track, or None in case the track
-    has no value on the position.
+    region, position and a list of values for each track, or None in case the
+    track has no value on the position.
 
-    @arg walkers: List of generators yielding pairs of (position, value) per
-        defined position.
-    @rtype: list(generator(int, str))
+    @arg walkers: List of generators yielding triples of (region, position,
+        value) per defined position.
+    @rtype: list(generator(str, int, str))
 
-    @return: Pairs of (position, values) per defined position.
-    @rtype: generator(int, list(str))
-
-    Todo: Handle chromosomes and their order.
+    @return: Triples of (region, position, values) per defined position.
+    @rtype: generator(str, int, list(str))
     """
     items = []
     for walker in walkers:
@@ -63,15 +104,15 @@ def walk_together(*walkers):
         if not any(items):
             break
 
-        position = min(item[0] for item in items if item is not None)
+        region, position = min(item[0:2] for item in items if item is not None)
 
-        values = [item[1] if item is not None and item[0] == position else None
-                  for item in items]
-        yield position, values
+        values = [item[1] if item is not None and item[0:2] == [region, position]
+                  else None for item in items]
+        yield region, position, values
 
         for i, item in enumerate(items):
 
-            if item is not None and item[0] == position:
+            if item is not None and item[0:2] == [region, position]:
                 try:
                     items[i] = next(walkers[i])
                 except StopIteration:
@@ -90,6 +131,6 @@ def write(walker, track=sys.stdout):
     Todo: Options for variable or fixed step, window size, etc.
     """
     track.write('track type=wiggle_0 name="" description=""\n')
-    for item in walker:
+    for region, position, value in walker:
         # Todo: See if float/int types both are represented correctly
-        track.write('%d %s\n' % item)
+        track.write('%d %s\n' % (position, value))

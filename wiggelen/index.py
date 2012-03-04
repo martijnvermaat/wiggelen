@@ -9,4 +9,17 @@ Licensed under the MIT license, see the LICENSE file.
 """
 
 
-# Todo.
+def index(track):
+    """
+    Todo: Use chaining of walker iterators to implement the use of index.
+    """
+    regions = {}
+    while True:
+        line = track.readline()
+        if not line:
+            break
+        if 'chrom=' not in line:
+            continue
+        region = line.split('chrom=')[1].split()[0]
+        regions[region] = track.tell() - len(line)
+    return regions

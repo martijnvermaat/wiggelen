@@ -39,8 +39,9 @@ def merge(*walkers, **options):
     Merge wiggle tracks.
 
     Todo: Is there a better name in (combine, fold, reduce)?
+    Todo: Would it be better to also pass region/position to the merger?
     """
     merger = options.get('merger', mergers['sum'])
 
-    for position, values in walk_together(*walkers):
-        yield position, merger(values)
+    for region, position, values in walk_together(*walkers):
+        yield region, position, merger(values)

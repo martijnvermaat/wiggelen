@@ -10,6 +10,8 @@ Todo: Create a useful tool/package out of this. Name suggestion: wiggelen.
 Todo: Multiple outputs with different mergers.
 Todo: Conversion to BigWig.
 Todo: Walking with step/window size.
+Todo: Connect with numpy/pandas.
+Todo: Sphinx documentation.
 
 Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>

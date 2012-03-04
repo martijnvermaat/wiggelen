@@ -14,6 +14,7 @@ import argparse
 
 from . import walk, write
 from .merge import merge, mergers
+from .index import index
 
 
 def main():
@@ -23,14 +24,28 @@ def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=__doc__.split('\n\n\n')[0])
-    parser.add_argument('-m', dest='merger', choices=mergers, default='sum',
+    subparsers = parser.add_subparsers(title='subcommands', dest='subcommand',
+        help='subcommand help')
+
+    mparser = subparsers.add_parser('merge',
+        help='merge any number of wiggle tracks in various ways')
+    mparser.add_argument('-m', dest='merger', choices=mergers, default='sum',
         help='merge operation to use (default: %(default)s)')
-    parser.add_argument('tracks', metavar='TRACK', nargs='+',
+    mparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track to merge')
+
+    iparser = subparsers.add_parser('index', help='index wiggle track')
+    iparser.add_argument('track', metavar='TRACK',
+        type=argparse.FileType('r'), help='wiggle track to index')
+
     args = parser.parse_args()
 
-    walkers = map(walk, args.tracks)
-    write(merge(*walkers, merger=mergers[args.merger]), track=sys.stdout)
+    if args.subcommand == 'merge':
+        walkers = map(walk, args.tracks)
+        write(merge(*walkers, merger=mergers[args.merger]), track=sys.stdout)
+
+    if args.subcommand == 'index':
+        print index(args.track)
 
 
 if __name__ == '__main__':
