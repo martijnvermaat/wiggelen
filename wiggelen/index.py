@@ -1,6 +1,17 @@
 """
 Index regions/chromosomes in wiggle tracks for random access.
 
+Indices can be written to a file next to the wiggle track file (in case this
+is a regular file). Example of the serialization we use:
+
+    #sum=4544353,count=63343
+    1 47
+    X 3433
+    Y 8743
+    MT 10362
+
+.. todo:: Include sum and count of values in the index.
+
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
 .. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>

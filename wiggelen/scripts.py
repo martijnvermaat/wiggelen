@@ -55,12 +55,12 @@ def main():
         type=argparse.FileType('r'), help='wiggle track')
 
     dparser = subparsers.add_parser('distance',
-        description='Calculate the distance between two wiggle tracks.',
-        help='calculate the distance between two wiggle tracks')
+        description='Calculate the distances between wiggle tracks.',
+        help='calculate the distances between wiggle tracks')
     dparser.add_argument('-n', '--no-indices', dest='no_indices',
         action='store_true',
         help='assume tracks are sorted, don\'t force building indices')
-    dparser.add_argument('tracks', metavar='TRACK', nargs=2,
+    dparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track')
 
     args = parser.parse_args()

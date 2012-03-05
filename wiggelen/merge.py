@@ -15,7 +15,7 @@ from .wiggle import walk_together
 
 
 # Compute the sum of all values.
-_merger_sum = lambda vs: sum(float(v) for v in vs if v is not None)
+_merger_sum = lambda vs: sum(v for v in vs if v is not None)
 
 # Compute the mean of all values (and use 0 for undefined values).
 # Todo: Also provide a mean over only the defined values.
@@ -43,14 +43,15 @@ def merge(*walkers, **options):
         >>> walkers = [walk(track, force_index=True) for track in tracks]
         >>> merge(*walkers)
 
-    :arg walkers: List of generators yielding triples of (region, position,
+    :arg walkers: List of generators yielding tuples of (region, position,
         value) per defined position.
-    :type walkers: list(generator(str, int, float))
+    :type walkers: list(generator(str, int, _))
     :keyword merger: Merge operation.
-    :type merger: function(list(float) -> float)
+    :type merger: function(list(_) -> _)
 
-    :return: Triples of (region, position, value) per defined position.
-    :rtype: generator(str, int, float)
+    :return: Tuples of (region, position, merged value) per defined position
+        in ``walkers``.
+    :rtype: generator(str, int, _)
 
     .. todo:: Is there a better name in (combine, fold, reduce)?
     .. todo:: Would it be better to also pass region/position to the merger?

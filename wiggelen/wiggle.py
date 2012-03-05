@@ -3,6 +3,8 @@ Read and write wiggle tracks.
 
 .. todo: Implement by_region(walker) that iterates over the regions and yields
     a walker for each?
+.. todo: Note in the documentation that walker values can be of any type, but
+    that valid wiggle tracks only have int or float values.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -20,15 +22,17 @@ from .index import index, write_index
 
 def walk(track=sys.stdin, force_index=False):
     """
-    Walk over the track and yield (region, position, value) triples.
+    Walk over the track and yield (region, position, value) tuples.
+
+    The values are always of type `int` or `float`.
 
     :arg track: Wiggle track.
     :type track: file
     :arg force_index: Force creating an index if it does not yet exist.
     :type force_index: bool
 
-    :return: Triples of (region, position, value) per defined position.
-    :rtype: generator(str, int, float)
+    :return: Tuples of (region, position, value) per defined position.
+    :rtype: generator(str, int, _)
 
     .. todo:: Optionally give a list of regions to walk, in that order.
     .. todo:: Do something with browser and track lines.
@@ -118,12 +122,12 @@ def walk_together(*walkers):
         tracks, use the :func:`walk` function with the ``force_index`` keyword
         argument.
 
-    :arg walkers: List of generators yielding triples of (region, position,
+    :arg walkers: List of generators yielding tuples of (region, position,
         value) per defined position.
-    :type walkers: list(generator(str, int, float))
+    :type walkers: list(generator(str, int, _))
 
-    :return: Triples of (region, position, values) per defined position.
-    :rtype: generator(str, int, list(float))
+    :return: Tuples of (region, position, values) per defined position.
+    :rtype: generator(str, int, list(_))
     """
     # We work with a list of lookahead items. If a walker has no more items,
     # we use None in the lookahead list.
@@ -171,12 +175,16 @@ def walk_together(*walkers):
 filter_ = itertools.ifilter
 
 
-def write(walker, track=sys.stdout):
+def write(walker, track=sys.stdout, serializer=str):
     """
     Write items from a walker to a wiggle track.
 
-    :arg walker: Triples of (region, position, value) per defined position.
-    :type walker: generator(str, int, float)
+    :arg walker: Tuples of (region, position, value) per defined position.
+    :type walker: generator(str, int, _)
+    :arg track: Writable file handle.
+    :type track: file
+    :arg serializer: Function making strings from values.
+    :type serializer: function(_ -> str)
 
     .. todo:: Options for variable or fixed step, window size, etc.
     """
@@ -197,7 +205,7 @@ def write(walker, track=sys.stdout):
             size += len(chrom)
             current_region = region
         # Todo: See if float/int types both are represented correctly.
-        step = '%d %s\n' % (position, value)
+        step = '%d %s\n' % (position, serializer(value))
         track.write(step)
         size += len(step)
 
