@@ -81,8 +81,15 @@ def main():
     if args.subcommand == 'distance':
         walkers = [walk(track, force_index=not args.no_indices)
                    for track in args.tracks]
-        for (left, right), dist in distance(*walkers).items():
-            print '%d-%d: %s' % (left, right, dist)
+        distances = distance(*walkers)
+        names = 'ABCDEFGH'
+        sys.stdout.write('   ' + ' '.join('  %s ' % n for n in names[:len(args.tracks)]) + '\n')
+        sys.stdout.write(names[0] + '    x\n')
+        for i in range(1, len(args.tracks)):
+            sys.stdout.write('%s  ' % names[i])
+            for j in range(0, i):
+                sys.stdout.write(' %.2f' % distances[i, j])
+            sys.stdout.write('  x\n')
 
 
 if __name__ == '__main__':
