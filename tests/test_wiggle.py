@@ -69,3 +69,43 @@ class TestWiggle(object):
         for expected, item in zip(b, walker):
             assert_equal(expected, item)
         assert_raises(StopIteration, next, walker)
+
+    def test_sort_multiple_regions(self):
+        """
+        Walk over a track with multiple regions and index.
+        """
+        values = [(2, 392.0),
+                  (3, 408.0),
+                  (4, 420.0),
+                  (5, 452.0),
+                  (7, 466.0),
+                  (8, 474.0),
+                  (9, 479.0)]
+        b = [(r, p, v) for r in ('1', '13', 'MT') for (p, v) in values]
+        walker = wiggelen.walk(open_('b.wig'), force_index=True)
+        for expected, item in zip(b, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
+    def test_store_index(self):
+        """
+        Walk over a track after the index has been made.
+        """
+        values = [(2, 392.0),
+                  (3, 408.0),
+                  (4, 420.0),
+                  (5, 452.0),
+                  (7, 466.0),
+                  (8, 474.0),
+                  (9, 479.0)]
+        b = [(r, p, v) for r in ('1', '13', 'MT') for (p, v) in values]
+
+        walker = wiggelen.walk(open_('b.wig'), force_index=True)
+        for expected, item in zip(b, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
+        walker = wiggelen.walk(open_('b.wig'))
+        for expected, item in zip(b, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
