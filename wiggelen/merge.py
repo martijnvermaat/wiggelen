@@ -11,9 +11,6 @@ Merge any number of wiggle tracks in various ways.
 
 from __future__ import division
 
-import sys
-import argparse
-
 from .wiggle import walk_together
 
 

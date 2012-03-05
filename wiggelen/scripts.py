@@ -14,8 +14,9 @@ import sys
 import argparse
 
 from . import walk, write
-from .merge import merge, mergers
 from .index import index, write_index
+from .merge import merge, mergers
+from .distance import distance
 
 
 def main():
@@ -34,13 +35,13 @@ def main():
         description='Build index for wiggle track.',
         help='build index for wiggle track')
     iparser.add_argument('track', metavar='TRACK',
-        type=argparse.FileType('r'), help='wiggle track to index')
+        type=argparse.FileType('r'), help='wiggle track')
 
     sparser = subparsers.add_parser('sort',
         description='Sort wiggle track regions alphabetically.',
         help='sort wiggle track regions alphabetically')
     sparser.add_argument('track', metavar='TRACK',
-        type=argparse.FileType('r'), help='wiggle track to sort')
+        type=argparse.FileType('r'), help='wiggle track')
 
     mparser = subparsers.add_parser('merge',
         description='Merge any number of wiggle tracks in various ways.',
@@ -51,7 +52,16 @@ def main():
         action='store_true',
         help='assume tracks are sorted, don\'t force building indices')
     mparser.add_argument('tracks', metavar='TRACK', nargs='+',
-        type=argparse.FileType('r'), help='wiggle track to merge')
+        type=argparse.FileType('r'), help='wiggle track')
+
+    dparser = subparsers.add_parser('distance',
+        description='Calculate the distance between two wiggle tracks.',
+        help='calculate the distance between two wiggle tracks')
+    dparser.add_argument('-n', '--no-indices', dest='no_indices',
+        action='store_true',
+        help='assume tracks are sorted, don\'t force building indices')
+    dparser.add_argument('tracks', metavar='TRACK', nargs=2,
+        type=argparse.FileType('r'), help='wiggle track')
 
     args = parser.parse_args()
 
@@ -67,6 +77,11 @@ def main():
         walkers = [walk(track, force_index=not args.no_indices)
                    for track in args.tracks]
         write(merge(*walkers, merger=mergers[args.merger]))
+
+    if args.subcommand == 'distance':
+        walkers = [walk(track, force_index=not args.no_indices)
+                   for track in args.tracks]
+        print distance(*walkers)
 
 
 if __name__ == '__main__':
