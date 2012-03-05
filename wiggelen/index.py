@@ -1,21 +1,25 @@
 """
 Index regions/chromosomes in wiggle tracks for random access.
 
-Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
+.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
+.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
 
-Licensed under the MIT license, see the LICENSE file.
+.. Licensed under the MIT license, see the LICENSE file.
 """
 
 
 import sys
 
 
+#: Suffix used for index files.
 INDEX_SUFFIX = '.idx'
 
 
-def index_filename(track=sys.stdin):
+def _index_filename(track=sys.stdin):
+    """
+    Try to create a filename for the index file.
+    """
     filename = getattr(track, 'name', None)
     if filename is not None and not filename.startswith('<'):
         return filename + INDEX_SUFFIX
@@ -23,9 +27,18 @@ def index_filename(track=sys.stdin):
 
 def write_index(idx, track=sys.stdout):
     """
-    Write the index to a file or fail silently.
+    Try to write the index to a file and return its filename.
+
+    :arg idx: Wiggle track index.
+    :type idx: dict(str, int)
+    :arg track: Wiggle track the index belongs to.
+    :type track: file
+
+    :return: Filename for the written index, or ``None`` if the index could
+        not be written.
+    :rtype: str
     """
-    filename = index_filename(track)
+    filename = _index_filename(track)
 
     if filename is not None:
         try:
@@ -38,11 +51,17 @@ def write_index(idx, track=sys.stdout):
 
 def read_index(track=sys.stdin):
     """
-    Read the index from a file or fail silently and return None.
+    Try to read the index from a file.
 
-    Todo: Only accept if index is newer than wiggle track?
+    :arg track: Wiggle track the index belongs to.
+    :type track: file
+
+    :return: Wiggle track index, or ``None`` if the index could not be read.
+    :rtype: dict(str, int)
+
+    .. todo:: Only accept if index is newer than wiggle track?
     """
-    filename = index_filename(track)
+    filename = _index_filename(track)
 
     if filename is not None:
         try:
@@ -56,16 +75,18 @@ def index(track=sys.stdin, force=False):
     """
     Return index of region positions in track.
 
-    @arg track: Wiggle track (default: standard input).
-    @type track: file
-    @kwarg force: Force creating an index if it does not yet exist
-        (default: False).
-    @type force: bool
+    :arg track: Wiggle track.
+    :type track: file
+    :arg force: Force creating an index if it does not yet exist.
+    :type force: bool
 
-    Todo: Handle non-writable index, corrupt index, etc.
-    Todo: Also including the end positions would make it possible to do random
-        jumps inside a region with some educated guessing. Perfect hits would
-        not be possible, since the length of the lines are variable.
+    :return: Wiggle track index.
+    :rtype: dict(str, int)
+
+    .. todo:: Handle non-writable index, corrupt index, etc.
+    .. todo:: Also including the end positions would make it possible to do
+        random jumps inside a region with some educated guessing. Perfect hits
+        would not be possible, since the length of the lines are variable.
     """
     idx = read_index(track)
 

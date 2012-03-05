@@ -22,7 +22,7 @@ def main():
     """
     Merge any number of wiggle tracks in various ways.
 
-    Todo: Organize this code based on functionality.
+    .. todo:: Organize this code based on functionality.
     """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,

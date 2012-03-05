@@ -1,23 +1,15 @@
 """
 Wiggelen, working with wiggle tracks in Python.
 
-Todo: Handle chromosomes. This means either assuming all tracks contain all
-    chromosomes and in the same order, or alternatively create an index with
-    the chromosomes for each track. Jeroen has code for this.
-Todo: Handle variable and fixed step types.
-Todo: Specify region(s) to use (same as filter?), possibly with a BED file.
-Todo: Create a useful tool/package out of this. Name suggestion: wiggelen.
-Todo: Multiple outputs with different mergers.
-Todo: Conversion to BigWig.
-Todo: Walking with step/window size.
-Todo: Connect with numpy/pandas.
-Todo: Sphinx documentation.
+.. todo:: Specify region(s) to use (same as filter?), possibly with a BED file.
+.. todo:: Conversion to BigWig.
+.. todo:: Connect with numpy/pandas.
 
-Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
+.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
+.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
 
-Licensed under the MIT license, see the LICENSE file.
+.. Licensed under the MIT license, see the LICENSE file.
 """
 
 

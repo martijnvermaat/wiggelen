@@ -1,11 +1,11 @@
 """
 Read and write wiggle tracks.
 
-Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
+.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
+.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
 
-Licensed under the MIT license, see the LICENSE file.
+.. Licensed under the MIT license, see the LICENSE file.
 """
 
 
@@ -19,20 +19,19 @@ def walk(track=sys.stdin, force_index=False):
     """
     Walk over the track and yield (region, position, value) triples.
 
-    @kwarg track: Wiggle track (default: standard input).
-    @type track: file
-    @kwarg force_index: Force creating an index if it does not yet exist
-        (default: False).
-    @type force_index: bool
+    :arg track: Wiggle track.
+    :type track: file
+    :arg force_index: Force creating an index if it does not yet exist.
+    :type force_index: bool
 
-    @return: Triples of (region, position, value) per defined position.
-    @rtype: generator(str, int, float)
+    :return: Triples of (region, position, value) per defined position.
+    :rtype: generator(str, int, float)
 
-    Todo: Optionally give a list of regions to walk, in that order.
-    Todo: Do something with browser and track lines.
-    Todo: Better exceptions.
-    Todo: Prettify this code.
-    Todo: Detect if index does not agree with track.
+    .. todo:: Optionally give a list of regions to walk, in that order.
+    .. todo:: Do something with browser and track lines.
+    .. todo:: Better exceptions.
+    .. todo:: Prettify this code.
+    .. todo:: Detect if index does not agree with track.
     """
     format_ = region = start = step = span = None
 
@@ -108,19 +107,20 @@ def walk(track=sys.stdin, force_index=False):
 def walk_together(*walkers):
     """
     Walk over all tracks simultaneously and for each position yield the
-    region, position and a list of values for each track, or None in case the
-    track has no value on the position.
+    region, position and a list of values for each track, or ``None`` in case
+    the track has no value on the position.
 
-    Note that this assumes the order of regions is compatible over all
-    walkers. If you are unsure if this is the case for your input wiggle
-    tracks, use the walk function with the force_index keyword argument.
+    .. note:: This assumes the order of regions is compatible over all
+        walkers. If you are unsure if this is the case for your input wiggle
+        tracks, use the :func:`walk` function with the ``force_index`` keyword
+        argument.
 
-    @arg walkers: List of generators yielding triples of (region, position,
+    :arg walkers: List of generators yielding triples of (region, position,
         value) per defined position.
-    @rtype: list(generator(str, int, float))
+    :type walkers: list(generator(str, int, float))
 
-    @return: Triples of (region, position, values) per defined position.
-    @rtype: generator(str, int, list(float))
+    :return: Triples of (region, position, values) per defined position.
+    :rtype: generator(str, int, list(float))
     """
     # We work with a list of lookahead items. If a walker has no more items,
     # we use None in the lookahead list.
@@ -164,7 +164,7 @@ def walk_together(*walkers):
                     items[i] = None
 
 
-# Filter items from a walker
+#: Filter items from a walker.
 filter_ = itertools.ifilter
 
 
@@ -172,7 +172,10 @@ def write(walker, track=sys.stdout):
     """
     Write items from a walker to a wiggle track.
 
-    Todo: Options for variable or fixed step, window size, etc.
+    :arg walker: Triples of (region, position, value) per defined position.
+    :type walker: generator(str, int, float)
+
+    .. todo:: Options for variable or fixed step, window size, etc.
     """
     size = 0
 

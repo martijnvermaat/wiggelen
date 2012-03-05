@@ -1,11 +1,11 @@
 """
 Merge any number of wiggle tracks in various ways.
 
-Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
+.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
+.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
 
-Licensed under the MIT license, see the LICENSE file.
+.. Licensed under the MIT license, see the LICENSE file.
 """
 
 
@@ -14,7 +14,7 @@ from __future__ import division
 import sys
 import argparse
 
-from . import walk_together
+from .wiggle import walk_together
 
 
 # Compute the sum of all values.
@@ -28,7 +28,7 @@ _merger_mean = lambda vs: _merger_sum(vs) / len(vs)
 _merger_count = lambda vs: sum(1 for v in vs if v is not None)
 
 
-# Predefined mergers.
+#: Predefined mergers.
 mergers = {'sum':   _merger_sum,
            'mean':  _merger_mean,
            'count': _merger_count}
@@ -39,23 +39,24 @@ def merge(*walkers, **options):
     Merge wiggle tracks.
 
     This assumes the walkers have their regions in the same order. You can
-    force this by using indices. Example:
+    force this by using indices. Example::
 
-        from wiggelen import walk
-        from wiggelen.merge import merge, mergers
+        >>> from wiggelen import walk
+        >>> from wiggelen.merge import merge, mergers
+        >>> walkers = [walk(track, force_index=True) for track in tracks]
+        >>> merge(*walkers)
 
-        walkers = [walk(track, force_index=True) for track in tracks]
-        merge(*walkers)
-
-    @arg walkers: List of generators yielding triples of (region, position,
+    :arg walkers: List of generators yielding triples of (region, position,
         value) per defined position.
-    @rtype: list(generator(str, int, float))
+    :type walkers: list(generator(str, int, float))
+    :keyword merger: Merge operation.
+    :type merger: function(list(float) -> float)
 
-    @return: Triples of (region, position, value) per defined position.
-    @rtype: generator(str, int, float)
+    :return: Triples of (region, position, value) per defined position.
+    :rtype: generator(str, int, float)
 
-    Todo: Is there a better name in (combine, fold, reduce)?
-    Todo: Would it be better to also pass region/position to the merger?
+    .. todo:: Is there a better name in (combine, fold, reduce)?
+    .. todo:: Would it be better to also pass region/position to the merger?
     """
     merger = options.get('merger', mergers['sum'])
 
