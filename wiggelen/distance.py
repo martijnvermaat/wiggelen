@@ -25,6 +25,9 @@ def getweights(coverage_left, coverage_right):
 
 
 def pairwise_comparisons(count):
+    """
+    .. todo:: Optionally include self-comparisons and both directions.
+    """
     return [(i, j) for i in range(1, count) for j in range(0, i)]
 
 
@@ -51,6 +54,7 @@ def distance(*walkers):
         values per track, which we don't store in the index at the moment.
     .. todo:: Noise reduction with threshold.
     .. todo:: Choose pairwise comparison function.
+    .. todo:: Can we refactor this by generalizing to a merge.pairwise?
     """
     # Temporary values, eventually this should be stored in the index.
     coverages = [23688, 9105, 34243, 34243, 34243][:len(walkers)]
@@ -63,6 +67,7 @@ def distance(*walkers):
     def merger(values):
         results = {}
         for left, right in comparisons:
+            # Todo: None if both are undefined.
             x = weights[left, right][0] * values[left] if values[left] else 0.0
             y = weights[left, right][1] * values[right] if values[right] else 0.0
             results[left, right] = float(abs(x - y)) / ((x + 1) * (y + 1))
