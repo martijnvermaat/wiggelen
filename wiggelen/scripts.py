@@ -81,7 +81,8 @@ def main():
     if args.subcommand == 'distance':
         walkers = [walk(track, force_index=not args.no_indices)
                    for track in args.tracks]
-        print distance(*walkers)
+        for (left, right), dist in distance(*walkers).items():
+            print '%d-%d: %s' % (left, right, dist)
 
 
 if __name__ == '__main__':

@@ -75,5 +75,4 @@ def distance(*walkers):
             counters[comparison] += value
             denominators[comparison] += 1  # Todo: only count 1 where at least one of the two is defined
 
-    for left, right in comparisons:
-        print '%d-%d: %s' % (left, right, counters[left,right] / denominators[left,right])
+    return dict((c, counters[c] / denominators[c]) for c in comparisons)
