@@ -8,32 +8,59 @@ import os
 from nose.tools import *
 
 import wiggelen
+from wiggelen.index import INDEX_SUFFIX
+
+
+DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 
 
 def open_(filename, mode='r'):
-    dir = os.path.join(os.path.dirname(__file__), 'data')
-    return open(os.path.join(dir, filename), mode)
-    
+    """
+    Open a file from the test data.
+    """
+    return open(os.path.join(DATA_DIR, filename), mode)
+
+
+def remove_indices():
+    """
+    Cleanup any index files for the test data.
+    """
+    for file in os.listdir(DATA_DIR):
+        if file.endswith(INDEX_SUFFIX):
+            os.unlink(os.path.join(DATA_DIR, file))
+
 
 class TestWiggle(object):
     """
     Tests for the wiggle module.
     """
-    def test_walk(self):
+    @classmethod
+    def setup_class(cls):
+        remove_indices()
+
+    def teardown(self):
+        remove_indices()
+
+    def test_walk_single_region(self):
         """
-        Simple walk.
+        Walk over a track with a single region.
         """
-        a = [('MT', 1, 520.0),
-             ('MT', 2, 536.0),
-             ('MT', 3, 553.0),
-             ('MT', 4, 568.0),
-             ('MT', 5, 598.0),
-             ('MT', 6, 616.0),
-             ('MT', 7, 629.0),
-             ('MT', 8, 649.0),
-             ('MT', 9, 657.0),
-             ('MT', 10, 676.0)]
-        walker = wiggelen.walk(open_('a.mt.wig'))
-        for expected, item in zip(a, walker):
+        c = [('MT', 1, 364.0),
+             ('MT', 6, 435.0),
+             ('MT', 10, 485.0)]
+        walker = wiggelen.walk(open_('c.wig'))
+        for expected, item in zip(c, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
+    def test_walk_multiple_regions(self):
+        """
+        Walk over a track with a single region.
+        """
+        c = [('MT', 1, 364.0),
+             ('MT', 6, 435.0),
+             ('MT', 10, 485.0)]
+        walker = wiggelen.walk(open_('c.wig'))
+        for expected, item in zip(c, walker):
             assert_equal(expected, item)
         assert_raises(StopIteration, next, walker)

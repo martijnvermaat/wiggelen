@@ -12,86 +12,97 @@ Licensed under the MIT license, see the LICENSE file.
 import sys
 import itertools
 
-from .index import index
+from .index import index, write_index
 
 
-def walk(track=sys.stdin, regions=None, index=None):
+def walk(track=sys.stdin, force_index=False):
     """
     Walk over the track and yield (region, position, value) triples.
 
-    @arg track: Wiggle track.
+    @kwarg track: Wiggle track (default: standard input).
     @type track: file
-    @arg regions: Optional list of regions to walk, in that order.
-    @type regions: list(str)
-    @arg index: Optional index to use for finding regions.
-    @type index: dict(str, int)
+    @kwarg force_index: Force creating an index if it does not yet exist
+        (default: False).
+    @type force_index: bool
 
     @return: Triples of (region, position, value) per defined position.
-    @rtype: generator(str, int, str)
+    @rtype: generator(str, int, float)
 
+    Todo: Optionally give a list of regions to walk, in that order.
     Todo: Do something with browser and track lines.
     Todo: Better exceptions.
-    Todo: Prettify the parsing code.
-    Todo: By default walk the regions from the index in alphabetical order,
-        even if no explicit list of regions is given. This would remove the
-        need for ordered_regions with merge.
+    Todo: Prettify this code.
+    Todo: Detect if index does not agree with track.
     """
-    format = region = start = step = span = None
+    format_ = region = start = step = span = None
 
-    #Todo: Work with the supplied regions and index.
-    #for region in regions:
-    #    if index:
-    #        track.seek(index[region])
-    #    else:
-    #        # check if we get expected region (possibly skipping empty ones)
+    idx = index(track, force=force_index)
 
-    for line in track:
-        if line.startswith('browser') or line.startswith('track'):
-            pass
+    if idx is None:
+        regions = [None]
+    else:
+        # Todo: Sort in a way that is compatible with existing wiggle tracks.
+        #     Inspiration could be sorted BAM files. GATK requires these to be
+        #     sorted according to the order in the reference file.
+        regions = sorted(idx)
 
-        elif line.startswith('variableStep'):
-            try:
-                fields = dict(map(lambda field: field.split('='),
-                                  line[len('variableStep'):].split()))
-                region = fields['chrom']
-                span = fields.get('span', 1)
-                format = 'variable'
-            except ValueError, KeyError:
+    for expected_region in regions:
+
+        if expected_region is not None:
+            track.seek(idx[expected_region])
+
+        for line in track:
+
+            if line.startswith('browser') or line.startswith('track'):
+                pass
+
+            elif line.startswith('variableStep'):
+                try:
+                    fields = dict(map(lambda field: field.split('='),
+                                      line[len('variableStep'):].split()))
+                    region = fields['chrom']
+                    span = fields.get('span', 1)
+                    format_ = 'variable'
+                except ValueError, KeyError:
+                    raise Exception('Could not parse line: %s' % line)
+                if expected_region is not None and region != expected_region:
+                    break
+
+            elif line.startswith('fixedStep'):
+                try:
+                    fields = dict(map(lambda field: field.split('='),
+                                      line[len('fixedStep'):].split()))
+                    region = fields['chrom']
+                    start = int(fields['start'])
+                    step = int(fields['step'])
+                    span = int(fields.get('span', 1))
+                    format_ = 'fixed'
+                except ValueError, KeyError:
+                    raise Exception('Could not parse line: %s' % line)
+                if expected_region is not None and region != expected_region:
+                    break
+
+            elif format_ == 'variable':
+                try:
+                    position, value = line.split()
+                    position = int(position)
+                    value = float(value) if '.' in value else int(value)
+                except ValueError:
+                    raise Exception('Could not parse line: %s' % line)
+                for i in range(span):
+                    yield region, position + i, value
+
+            elif format_ == 'fixed':
+                try:
+                    value = float(line) if '.' in line else int(line)
+                except ValueError:
+                    raise Exception('Could not parse line: %s' % line)
+                for i in range(span):
+                    yield region, start + i, value
+                start += step
+
+            else:
                 raise Exception('Could not parse line: %s' % line)
-
-        elif line.startswith('fixedStep'):
-            try:
-                fields = dict(map(lambda field: field.split('='),
-                                  line[len('fixedStep'):].split()))
-                region = fields['chrom']
-                start = int(fields['start'])
-                step = int(fields['step'])
-                span = int(fields.get('span', 1))
-                format = 'fixed'
-            except ValueError, KeyError:
-                raise Exception('Could not parse line: %s' % line)
-
-        elif format == 'variable':
-            try:
-                position, value = line.split()
-                position = int(position)
-                value = float(value) if '.' in value else int(value)
-            except ValueError:
-                raise Exception('Could not parse line: %s' % line)
-            for i in range(span):
-                yield region, position + i, value
-
-        elif format == 'fixed':
-            try:
-                value = float(line) if '.' in line else int(line)
-            except ValueError:
-                raise Exception('Could not parse line: %s' % line)
-            for i in range(span):
-                yield region, start + i, value
-            start += step
-
-        else:
-            raise Exception('Could not parse line: %s' % line)
 
 
 def walk_together(*walkers):
@@ -100,13 +111,19 @@ def walk_together(*walkers):
     region, position and a list of values for each track, or None in case the
     track has no value on the position.
 
+    Note that this assumes the order of regions is compatible over all
+    walkers. If you are unsure if this is the case for your input wiggle
+    tracks, use the walk function with the force_index keyword argument.
+
     @arg walkers: List of generators yielding triples of (region, position,
         value) per defined position.
-    @rtype: list(generator(str, int, str))
+    @rtype: list(generator(str, int, float))
 
     @return: Triples of (region, position, values) per defined position.
-    @rtype: generator(str, int, list(str))
+    @rtype: generator(str, int, list(float))
     """
+    # We work with a list of lookahead items. If a walker has no more items,
+    # we use None in the lookahead list.
     items = []
     for walker in walkers:
         try:
@@ -114,19 +131,33 @@ def walk_together(*walkers):
         except StopIteration:
             items.append(None)
 
+    # Regions seen so far.
+    regions = set()
+    previous_region = None
+
     while True:
+        # If all lookahead items are None, we are done.
         if not any(items):
             break
 
+        # Get the next position to yield.
         region, position = min(item[0:2] for item in items if item is not None)
 
-        values = [item[1] if item is not None and item[0:2] == [region, position]
+        # Check region order compatibility.
+        if region != previous_region:
+            if region in regions:
+                raise Exception('The order of regions is not compatible')
+            regions.add(region)
+            previous_region = region
+
+        # Yield all values at this position.
+        values = [item[2] if item is not None and item[0:2] == (region, position)
                   else None for item in items]
         yield region, position, values
 
+        # Advance the lookahead list where we just yielded a value.
         for i, item in enumerate(items):
-
-            if item is not None and item[0:2] == [region, position]:
+            if item is not None and item[0:2] == (region, position):
                 try:
                     items[i] = next(walkers[i])
                 except StopIteration:
@@ -141,10 +172,27 @@ def write(walker, track=sys.stdout):
     """
     Write items from a walker to a wiggle track.
 
-    Todo: Handle chromosomes.
     Todo: Options for variable or fixed step, window size, etc.
     """
-    track.write('track type=wiggle_0 name="" description=""\n')
+    size = 0
+
+    header = 'track type=wiggle_0 name="" description=""\n'
+    track.write(header)
+    size += len(header)
+
+    idx = {}
+    current_region = None
+
     for region, position, value in walker:
-        # Todo: See if float/int types both are represented correctly
-        track.write('%d %s\n' % (position, value))
+        if region != current_region:
+            idx[region] = size
+            chrom = 'variableStep chrom=%s\n' % region
+            track.write(chrom)
+            size += len(chrom)
+            current_region = region
+        # Todo: See if float/int types both are represented correctly.
+        step = '%d %s\n' % (position, value)
+        track.write(step)
+        size += len(step)
+
+    write_index(idx, track)

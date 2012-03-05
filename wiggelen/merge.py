@@ -15,7 +15,6 @@ import sys
 import argparse
 
 from . import walk_together
-from .index import index
 
 
 # Compute the sum of all values.
@@ -40,16 +39,20 @@ def merge(*walkers, **options):
     Merge wiggle tracks.
 
     This assumes the walkers have their regions in the same order. You can
-    force this by using the union of their regions and indices. Example:
+    force this by using indices. Example:
 
-        from wiggelen import walk, write
-        from wiggelen.index import index, ordered_regions
+        from wiggelen import walk
         from wiggelen.merge import merge, mergers
 
-        indices = map(index, tracks)
-        walkers = [walk(track, regions=ordered_regions(*indices), index=index)
-                   for track, index in zip(tracks, indices)]
+        walkers = [walk(track, force_index=True) for track in tracks]
         merge(*walkers)
+
+    @arg walkers: List of generators yielding triples of (region, position,
+        value) per defined position.
+    @rtype: list(generator(str, int, float))
+
+    @return: Triples of (region, position, value) per defined position.
+    @rtype: generator(str, int, float)
 
     Todo: Is there a better name in (combine, fold, reduce)?
     Todo: Would it be better to also pass region/position to the merger?

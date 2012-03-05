@@ -1,6 +1,7 @@
 """
 Command line interface for working with wiggle tracks.
 
+
 Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
 Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
@@ -14,12 +15,14 @@ import argparse
 
 from . import walk, write
 from .merge import merge, mergers
-from .index import index, ordered_regions
+from .index import index, write_index
 
 
 def main():
     """
     Merge any number of wiggle tracks in various ways.
+
+    Todo: Organize this code based on functionality.
     """
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -27,28 +30,43 @@ def main():
     subparsers = parser.add_subparsers(title='subcommands', dest='subcommand',
         help='subcommand help')
 
-    mparser = subparsers.add_parser('merge',
-        help='merge any number of wiggle tracks in various ways')
-    mparser.add_argument('-m', dest='merger', choices=mergers, default='sum',
-        help='merge operation to use (default: %(default)s)')
-    mparser.add_argument('tracks', metavar='TRACK', nargs='+',
-        type=argparse.FileType('r'), help='wiggle track to merge')
-
-    iparser = subparsers.add_parser('index', help='index wiggle track')
+    iparser = subparsers.add_parser('index',
+        description='Build index for wiggle track.',
+        help='build index for wiggle track')
     iparser.add_argument('track', metavar='TRACK',
         type=argparse.FileType('r'), help='wiggle track to index')
 
+    sparser = subparsers.add_parser('sort',
+        description='Sort wiggle track regions alphabetically.',
+        help='sort wiggle track regions alphabetically')
+    sparser.add_argument('track', metavar='TRACK',
+        type=argparse.FileType('r'), help='wiggle track to sort')
+
+    mparser = subparsers.add_parser('merge',
+        description='Merge any number of wiggle tracks in various ways.',
+        help='merge any number of wiggle tracks in various ways')
+    mparser.add_argument('-m', dest='merger', choices=mergers, default='sum',
+        help='merge operation to use (default: %(default)s)')
+    mparser.add_argument('-n', '--no-indices', dest='no_indices',
+        action='store_true',
+        help='assume tracks are sorted, don\'t force building indices')
+    mparser.add_argument('tracks', metavar='TRACK', nargs='+',
+        type=argparse.FileType('r'), help='wiggle track to merge')
+
     args = parser.parse_args()
 
-    if args.subcommand == 'merge':
-        #walkers = map(walk, args.tracks)
-        indices = map(idx, args.tracks)
-        walkers = [walk(track, regions=ordered_regions(*indices), index=idx)
-                   for track, idx in zip(args.tracks, indices)]
-        write(merge(*walkers, merger=mergers[args.merger]), track=sys.stdout)
-
     if args.subcommand == 'index':
-        print index(args.track)
+        idx = index(args.track, force=True)
+        if write_index(idx, args.track) is None:
+            parser.error('Could not write index file')
+
+    if args.subcommand == 'sort':
+        write(walk(args.track, force_index=True))
+
+    if args.subcommand == 'merge':
+        walkers = [walk(track, force_index=not args.no_indices)
+                   for track in args.tracks]
+        write(merge(*walkers, merger=mergers[args.merger]))
 
 
 if __name__ == '__main__':
