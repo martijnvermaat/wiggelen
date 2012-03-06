@@ -6,6 +6,9 @@ This module implements the algorithm from the `wiggledist <https://humgenproject
 program, an efficient tool to assess similarity of next generation sequencing
 datasets.
 
+.. todo:: Implement the noise filter from ``wiggledist``. This is tricky to
+    implement in a nice way, since it should also be applied during indexing.
+
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
 .. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
@@ -58,6 +61,9 @@ def matrix(size, reflexive=False, symmetric=False):
     """
     Create all coordinates in a square matrix.
 
+    With the default ``False`` value for ``reflexive`` and ``symmetric``,
+    include only the coordinates below the diagonal.
+
     :arg size: Width and height of the matrix.
     :type size: int
     :reflexive: Include coordinates on (x, x) diagonal.
@@ -66,10 +72,10 @@ def matrix(size, reflexive=False, symmetric=False):
 
     :return: All coordinates in the matrix as tuples.
     :rtype: list(tuple(int, int))
-
-    .. todo:: Implement ``reflexive`` and ``symmetric``.
     """
-    return [(i, j) for i in range(1, size) for j in range(i)]
+    return [(i, j) for i in range(0, size) for j in
+            range(i + 1 if reflexive else i) \
+            + range(i + 1, size if symmetric else 0)]
 
 
 def distance(*tracks, **options):
@@ -85,13 +91,6 @@ def distance(*tracks, **options):
         coordinates in the distance matrix to their values.
     :rtype: dict((int, int), float)
 
-    .. todo:: This is not yet finished. For one thing, we need the summed
-        values per track, which we don't store in the index at the moment.
-    .. todo:: Noise reduction with threshold.
-    .. todo:: Choose pairwise comparison function.
-    .. todo:: Can we refactor this by generalizing to a merge.pairwise?
-    .. todo:: Not creating the index is not an option here, update note on
-        assumption for this.
     .. todo:: Check where this goes wrong if we cannot .seek() the tracks.
     """
     metric = options.get('metric', metrics['a'])
