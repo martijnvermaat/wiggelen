@@ -176,6 +176,10 @@ def walk_together(*walkers):
 filter_ = itertools.ifilter
 
 
+#: Map items from a walker.
+map_ = itertools.imap
+
+
 def write(walker, track=sys.stdout, serializer=str):
     """
     Write items from a walker to a wiggle track.

@@ -36,6 +36,6 @@ __version_info__ = ('0', '1', 'dev')
 
 
 __version__ = '.'.join(__version_info__)
-__author__ = 'Martijn Vermaat and Jeroen Laros'
+__author__ = 'LUMC, Martijn Vermaat, Jeroen Laros'
 __contact__ = 'm.vermaat.hg@lumc.nl'
 __homepage__ = 'http://www.humgen.nl'

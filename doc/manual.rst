@@ -1,10 +1,10 @@
-Introduction
-============
+Manual
+======
 
 This is an introduction to working with Wiggelen.
 
 
-Reading
+Walking
 -------
 
 Todo.

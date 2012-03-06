@@ -8,7 +8,7 @@ Working with wiggle tracks in Python.
 .. toctree::
    :maxdepth: 2
 
-   intro
+   manual
    api
 
 
