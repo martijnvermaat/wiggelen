@@ -112,23 +112,60 @@ def index(track=sys.stdin, force=False):
         random jumps inside a region with some educated guessing. Perfect hits
         would not be possible, since the length of the lines are variable.
     .. todo:: Also return index filename so we can check if it was written.
+    .. todo:: Just to calculate the summaries, we repeat ourselves quite a bit
+        here compared to the parsing in wiggle.walk, we could refactor this.
     """
     idx = read_index(track)
 
-    if idx is not None or not force:
-        return idx
+    if idx is not None:
+        summary, mapping = idx
+        return summary, mapping, None
+
+    if not force:
+        return None
 
     # Todo: Populate summary.
-    summary = {'sum': 34000, 'count': 4343}
+    summary = {'sum': 0, 'count': 0}
     mapping = {}
+    format_ = span = None
     while True:
         line = track.readline()
         if not line:
             break
-        if 'chrom=' not in line:
-            continue
-        region = line.split('chrom=')[1].split()[0]
-        mapping[region] = track.tell() - len(line)
+        if line.startswith('browser') or line.startswith('track'):
+            pass
+        elif line.startswith('variableStep'):
+            region = line.split('chrom=')[1].split()[0]
+            mapping[region] = track.tell() - len(line)
+            try:
+                span = line.split('span=')[1].split()[0]
+            except IndexError:
+                span = 1
+            format_ = 'variable'
+        elif line.startswith('fixedStep'):
+            region = line.split('chrom=')[1].split()[0]
+            mapping[region] = track.tell() - len(line)
+            try:
+                span = line.split('span=')[1].split()[0]
+            except IndexError:
+                span = 1
+            format_ = 'fixed'
+        elif format_ == 'variable':
+            try:
+                position, value = line.split()
+                value = float(value) if '.' in value else int(value)
+            except ValueError:
+                raise Exception('Could not parse line: %s' % line)
+            summary['count'] += 1 * span
+            summary['sum'] += value * span
+        elif format_ == 'fixed':
+            try:
+                value = float(line) if '.' in line else int(line)
+            except ValueError:
+                raise Exception('Could not parse line: %s' % line)
+            summary['count'] += 1 * span
+            summary['sum'] += value * span
+        else:
+            raise Exception('Could not parse line: %s' % line)
 
-    write_index(summary, mapping, track)
-    return summary, mapping
+    return summary, mapping, write_index(summary, mapping, track)

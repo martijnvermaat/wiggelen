@@ -24,8 +24,16 @@ from .merge import merge
 def normalize(*values):
     """
     Normalize values relative to the smallest value.
+
+    :arg values: List of values.
+    :type values: list(float)
+
+    :return: Scale the values such that the minimum is 1.
+    :rtype: list(float)
     """
     min_value = min(*values)
+    if not min_value:
+        return [1 for _ in values]
     return [value / min_value for value in values]
 
 

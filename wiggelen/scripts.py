@@ -66,9 +66,8 @@ def main():
     args = parser.parse_args()
 
     if args.subcommand == 'index':
-        summary, mapping = index(args.track, force=True)
-        # Note that this writes the index twice if it does not yet exist.
-        if write_index(summary, mapping, args.track) is None:
+        summary, mapping, filename = index(args.track, force=True)
+        if filename is None:
             parser.error('Could not write index file')
 
     if args.subcommand == 'sort':

@@ -47,7 +47,7 @@ def walk(track=sys.stdin, force_index=False):
     if idx is None:
         regions = [None]
     else:
-        _, mapping = idx
+        _, mapping, _ = idx
         # Todo: Sort in a way that is compatible with existing wiggle tracks.
         #     Inspiration could be sorted BAM files. GATK requires these to be
         #     sorted according to the order in the reference file.
