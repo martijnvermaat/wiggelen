@@ -13,7 +13,7 @@ Licensed under the MIT license, see the LICENSE file.
 import sys
 import argparse
 
-from . import walk, write
+from .wiggle import walk, write, map_
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
@@ -21,7 +21,7 @@ from .distance import metrics, distance
 
 def main():
     """
-    Merge any number of wiggle tracks in various ways.
+    Command line interface.
 
     .. todo:: Organize this code based on functionality.
     """
@@ -42,6 +42,14 @@ def main():
         help='sort wiggle track regions alphabetically')
     sparser.add_argument('track', metavar='TRACK',
         type=argparse.FileType('r'), help='wiggle track')
+
+    cparser = subparsers.add_parser('scale',
+        description='Scale values in a wiggle track.',
+        help='scale values in a wiggle track')
+    cparser.add_argument('track', metavar='TRACK',
+        type=argparse.FileType('r'), help='wiggle track')
+    cparser.add_argument('-f', '--factor', dest='factor', type=float,
+        default=0.1, help='scaling factor to use (default: %(default)s)')
 
     mparser = subparsers.add_parser('merge',
         description='Merge any number of wiggle tracks in various ways.',
@@ -72,12 +80,17 @@ def main():
     if args.subcommand == 'sort':
         write(walk(args.track, force_index=True))
 
+    if args.subcommand == 'scale':
+        scale = lambda (r, p, v): (r, p, v * args.factor)
+        write(map_(scale, walk(args.track)))
+
     if args.subcommand == 'merge':
         walkers = [walk(track, force_index=not args.no_indices)
                    for track in args.tracks]
         write(merge(*walkers, merger=mergers[args.merger]))
 
     if args.subcommand == 'distance':
+        # Todo: Cleanup this code.
         distances = distance(*args.tracks, metric=metrics[args.metric])
         def name(index):
             return chr(ord('A') + index)

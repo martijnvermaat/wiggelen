@@ -87,7 +87,7 @@ def read_index(track=sys.stdin):
 
     :return: Wiggle track summary and mapping, or ``None`` if the index could
         not be read.
-    :rtype: tuple(dict(str, _), dict(str, int))
+    :rtype: dict(str, _), dict(str, int)
 
     .. todo:: Only accept if index is newer than wiggle track?
     """
@@ -115,8 +115,8 @@ def index(track=sys.stdin, force=False):
     :arg force: Force creating an index if it does not yet exist.
     :type force: bool
 
-    :return: Wiggle track summary and mapping.
-    :rtype: tuple(dict(str, _), dict(str, int))
+    :return: Wiggle track summary, mapping, and index filename.
+    :rtype: dict(str, _), dict(str, int), str
 
     .. todo:: Handle non-writable index, corrupt index, etc.
     .. todo:: Also including the end positions would make it possible to do

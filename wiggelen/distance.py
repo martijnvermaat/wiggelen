@@ -71,7 +71,7 @@ def matrix(size, reflexive=False, symmetric=False):
     :symmetric: Include coordinates (x, y) where x < y.
 
     :return: All coordinates in the matrix as tuples.
-    :rtype: list(tuple(int, int))
+    :rtype: list(int, int)
     """
     return [(i, j) for i in range(0, size) for j in
             range(i + 1 if reflexive else i) \

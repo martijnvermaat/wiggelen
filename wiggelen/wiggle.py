@@ -5,6 +5,8 @@ Read and write wiggle tracks.
     a walker for each?
 .. todo: Note in the documentation that walker values can be of any type, but
     that valid wiggle tracks only have int or float values.
+.. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
+    ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
