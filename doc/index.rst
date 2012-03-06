@@ -22,7 +22,7 @@ functionality.
 The main goal of Wiggelen is to provide `light-weight`_ and `unified`_ access
 to wiggle tracks.
 
-Example:
+Example::
 
     >>> import wiggelen
     >>> for x in wiggelen.walk(open('test.wig')):
