@@ -4,7 +4,6 @@ Wiggelen, working with wiggle tracks in Python.
 .. todo:: Specify region(s) to use (same as filter?), possibly with a BED file.
 .. todo:: Conversion to BigWig.
 .. todo:: Connect with numpy/pandas.
-.. todo:: Integrate wiggledist.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>

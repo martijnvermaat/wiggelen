@@ -122,7 +122,6 @@ def index(track=sys.stdin, force=False):
     .. todo:: Also including the end positions would make it possible to do
         random jumps inside a region with some educated guessing. Perfect hits
         would not be possible, since the length of the lines are variable.
-    .. todo:: Also return index filename so we can check if it was written.
     .. todo:: Just to calculate the summaries, we repeat ourselves quite a bit
         here compared to the parsing in wiggle.walk, we could refactor this.
     """
@@ -135,7 +134,6 @@ def index(track=sys.stdin, force=False):
     if not force:
         return None
 
-    # Todo: Populate summary.
     summary = {'sum': 0, 'count': 0}
     mapping = {}
     format_ = span = None

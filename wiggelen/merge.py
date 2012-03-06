@@ -53,7 +53,6 @@ def merge(*walkers, **options):
         in ``walkers``.
     :rtype: generator(str, int, _)
 
-    .. todo:: Is there a better name in (combine, fold, reduce)?
     .. todo:: Would it be better to also pass region/position to the merger?
     """
     merger = options.get('merger', mergers['sum'])
