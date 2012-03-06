@@ -2,12 +2,24 @@
 Calculate the distance between two wiggle tracks using a metric designed for
 multisets.
 
-This module implements the algorithm from the `wiggledist <https://humgenprojects.lumc.nl/trac/wiggledist/>`_
-program, an efficient tool to assess similarity of next generation sequencing
-datasets.
+This module implements the algorithm from the
+`wiggledist <https://humgenprojects.lumc.nl/trac/wiggledist/>`_ program, an
+efficient tool to assess similarity of next generation sequencing datasets.
+
+The algorithm can be parameterized by a pairwise distance metric. Four of
+these metrics are predefined in :attr:`metrics`:
+
+Metric ``a``: :math:`\\frac{|x - y|}{(x + 1) (y + 1)}`
+
+Metric ``b``: :math:`\\frac{|x - y|}{x + y + 1}`
+
+Metric ``c``: :math:`\\frac{\\text{max}(x, y) \, |x - y|}{(x^2 + 1) (y^2 + 1)}`
+
+Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
 
 .. todo:: Implement the noise filter from ``wiggledist``. This is tricky to
-    implement in a nice way, since it should also be applied during indexing.
+    implement in a nice way, since it should be applied during indexing but
+    depends on a variable threshold.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -34,7 +46,8 @@ _metric_c = lambda x, y : (max(x, y) * abs(x - y)) \
 _metric_d = lambda x, y : abs(x - y) / (max(x, y) + 1)
 
 
-#: Predefined pairwise distance metrics.
+#: Predefined pairwise distance metrics. See :mod:`wiggelen.distance` for
+#: their definition.
 metrics = {'a': _metric_a,
            'b': _metric_b,
            'c': _metric_c,
@@ -66,12 +79,33 @@ def matrix(size, reflexive=False, symmetric=False):
 
     :arg size: Width and height of the matrix.
     :type size: int
-    :reflexive: Include coordinates on (x, x) diagonal.
+    :reflexive: Include coordinates on (``x``, ``x``) diagonal.
     :type reflexive: bool
-    :symmetric: Include coordinates (x, y) where x < y.
+    :symmetric: Include coordinates (``x``, ``y``) above the diagonal (where
+        ``x < y``).
 
     :return: All coordinates in the matrix as tuples.
     :rtype: list(int, int)
+
+    Examples::
+
+        >>> matrix(5)
+        [(1, 0),
+         (2, 0), (2, 1),
+         (3, 0), (3, 1), (3, 2),
+         (4, 0), (4, 1), (4, 2), (4, 3)]
+        >>> matrix(5, reflexive=True)
+        [(0, 0),
+         (1, 0), (1, 1),
+         (2, 0), (2, 1), (2, 2),
+         (3, 0), (3, 1), (3, 2), (3, 3),
+         (4, 0), (4, 1), (4, 2), (4, 3), (4, 4)]
+        >>> matrix(5, symmetric=True)
+        [        (0, 1), (0, 2), (0, 3), (0, 4),
+         (1, 0),         (1, 2), (1, 3), (1, 4),
+         (2, 0), (2, 1),         (2, 3), (2, 4),
+         (3, 0), (3, 1), (3, 2),         (3, 4),
+         (4, 0), (4, 1), (4, 2), (4, 3)        ]
     """
     return [(i, j) for i in range(0, size) for j in
             range(i + 1 if reflexive else i) \
@@ -81,6 +115,10 @@ def matrix(size, reflexive=False, symmetric=False):
 def distance(*tracks, **options):
     """
     Calculate the pairwise distances between wiggle tracks.
+
+    .. note:: This function does not implement the noise filter from the
+        `wiggledist <https://humgenprojects.lumc.nl/trac/wiggledist/>`_
+        program. It takes all values into account.
 
     :arg tracks: List of wiggle tracks.
     :type walkers: list(file)

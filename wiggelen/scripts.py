@@ -62,6 +62,8 @@ def main():
     mparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track')
 
+    # Todo: Add additional information on the metrics (using the epilog
+    # argument of the subparser).
     dparser = subparsers.add_parser('distance',
         description='Calculate the distances between wiggle tracks.',
         help='calculate the distances between wiggle tracks')

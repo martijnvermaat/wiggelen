@@ -1,6 +1,10 @@
 """
 Read and write wiggle tracks.
 
+The `wiggle (WIG) format <https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html>`_
+is for storing dense, continuous genomic data such as GC percent, probability
+scores, read depth, and transcriptome data.
+
 .. todo: Implement by_region(walker) that iterates over the regions and yields
     a walker for each?
 .. todo: Note in the documentation that walker values can be of any type, but
@@ -35,6 +39,16 @@ def walk(track=sys.stdin, force_index=False):
 
     :return: Tuples of (region, position, value) per defined position.
     :rtype: generator(str, int, _)
+
+    Example::
+
+        >>> for x in walk():
+        ...     x
+        ('chr18', 34344, 629.0)
+        ('chr18', 34345, 649.0)
+        ('chr18', 34446, 657.0)
+        ('chrM',  308,   520.0)
+        ('chrM',  309,   519.0)
 
     .. todo:: Optionally give a list of regions to walk, in that order.
     .. todo:: Do something with browser and track lines.
@@ -131,6 +145,16 @@ def walk_together(*walkers):
 
     :return: Tuples of (region, position, values) per defined position.
     :rtype: generator(str, int, list(_))
+
+    Example::
+
+        >>> for x in walk_together(walk(open('a.wig')), walk(open('b.wig'))):
+        ...     x
+        ('18', 7, [29.0, None])
+        ('18', 8, [49.0, None])
+        ('18', 9, [None, 87.0])
+        ('MT', 1, [20.0, None])
+        ('MT', 2, [36.0, 92.0])
     """
     # We work with a list of lookahead items. If a walker has no more items,
     # we use None in the lookahead list.
@@ -192,6 +216,19 @@ def write(walker, track=sys.stdout, serializer=str):
     :type track: file
     :arg serializer: Function making strings from values.
     :type serializer: function(_ -> str)
+
+    Example::
+
+       >>> write(walk(open('a.wig')))
+       track type=wiggle_0 name="" description=""
+       variableStep chrom=1
+       1 520.0
+       4 536.0
+       8 553.0
+       variableStep chrom=MT
+       1 568.0
+       2 598.0
+       6 616.0
 
     .. todo:: Options for variable or fixed step, window size, etc.
     """
