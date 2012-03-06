@@ -13,8 +13,8 @@ Wiggelen is a Python library for working with `wiggle tracks <https://cgwb.nci.n
 (WIG files). It also provides a command line interface to some of its
 functionality.
 
-The main goal of Wiggelen is to provide `light-weight`_ and `unified`_ access
-to wiggle tracks.
+The main goal of Wiggelen is to provide light-weight and unified access to
+wiggle tracks.
 
 Example:
 
