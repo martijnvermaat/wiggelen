@@ -199,8 +199,7 @@ def write(walker, track=sys.stdout, serializer=str):
     track.write(header)
     size += len(header)
 
-    # Todo: Populate summary.
-    summary = {'sum': 34000, 'count': 4343}
+    summary = {'sum': 0, 'count': 0}
     mapping = {}
     current_region = None
 
@@ -214,5 +213,7 @@ def write(walker, track=sys.stdout, serializer=str):
         step = '%d %s\n' % (position, serializer(value))
         track.write(step)
         size += len(step)
+        summary['sum'] += value
+        summary['count'] += 1
 
     write_index(summary, mapping, track)
