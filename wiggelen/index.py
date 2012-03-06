@@ -1,7 +1,11 @@
 """
 Index regions/chromosomes in wiggle tracks for random access.
 
-Indices can be written to a file next to the wiggle track file (in case this
+Indexing a wiggle track results in two dictionaries: the first contains some
+summary data, the second is a mapping of regions and their positions in the
+wiggle track file.
+
+This data can be written to a file next to the wiggle track file (in case this
 is a regular file). Example of the serialization we use:
 
     #sum=4544353,count=63343
@@ -10,7 +14,9 @@ is a regular file). Example of the serialization we use:
     Y 8743
     MT 10362
 
-.. todo:: Include sum and count of values in the index.
+.. todo:: Cache the index objects somehow during the process. Unfortunately,
+    we cannot attach it to the track file handler, as it does not accept
+    additional attributes.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -36,12 +42,14 @@ def _index_filename(track=sys.stdin):
         return filename + INDEX_SUFFIX
 
 
-def write_index(idx, track=sys.stdout):
+def write_index(summary, mapping, track=sys.stdout):
     """
     Try to write the index to a file and return its filename.
 
-    :arg idx: Wiggle track index.
-    :type idx: dict(str, int)
+    :arg summary: Wiggle track summary data.
+    :type summary: dict(str, _)
+    :arg mapping: Mapping of regions to wiggle track positions.
+    :type mapping: dict(str, int)
     :arg track: Wiggle track the index belongs to.
     :type track: file
 
@@ -54,7 +62,8 @@ def write_index(idx, track=sys.stdout):
     if filename is not None:
         try:
             with open(filename, 'w') as f:
-                f.write('\n'.join('%s %d' % i for i in idx.items()) + '\n')
+                f.write('#' + ','.join('%s=%s' % d for d in summary.items()) + '\n')
+                f.write('\n'.join('%s %d' % i for i in mapping.items()) + '\n')
                 return filename
         except IOError:
             pass
@@ -67,8 +76,9 @@ def read_index(track=sys.stdin):
     :arg track: Wiggle track the index belongs to.
     :type track: file
 
-    :return: Wiggle track index, or ``None`` if the index could not be read.
-    :rtype: dict(str, int)
+    :return: Wiggle track summary and mapping, or ``None`` if the index could
+        not be read.
+    :rtype: tuple(dict(str, _), dict(str, int))
 
     .. todo:: Only accept if index is newer than wiggle track?
     """
@@ -77,7 +87,10 @@ def read_index(track=sys.stdin):
     if filename is not None:
         try:
             with open(filename) as f:
-                return dict((r, int(p)) for r, p in (l.split() for l in f))
+                summary = dict((k, float(v)) for k, v in
+                               (d.split('=') for d in next(f)[1:-1].split(',')))
+                mapping = dict((r, int(p)) for r, p in (l.split() for l in f))
+                return summary, mapping
         except IOError:
             pass
 
@@ -91,8 +104,8 @@ def index(track=sys.stdin, force=False):
     :arg force: Force creating an index if it does not yet exist.
     :type force: bool
 
-    :return: Wiggle track index.
-    :rtype: dict(str, int)
+    :return: Wiggle track summary and mapping.
+    :rtype: tuple(dict(str, _), dict(str, int))
 
     .. todo:: Handle non-writable index, corrupt index, etc.
     .. todo:: Also including the end positions would make it possible to do
@@ -104,7 +117,9 @@ def index(track=sys.stdin, force=False):
     if idx is not None or not force:
         return idx
 
-    idx = {}
+    # Todo: Populate summary.
+    summary = {'sum': 34000, 'count': 4343}
+    mapping = {}
     while True:
         line = track.readline()
         if not line:
@@ -112,7 +127,7 @@ def index(track=sys.stdin, force=False):
         if 'chrom=' not in line:
             continue
         region = line.split('chrom=')[1].split()[0]
-        idx[region] = track.tell() - len(line)
+        mapping[region] = track.tell() - len(line)
 
-    write_index(idx, track)
-    return idx
+    write_index(summary, mapping, track)
+    return summary, mapping

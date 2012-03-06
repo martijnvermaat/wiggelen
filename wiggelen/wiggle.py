@@ -47,15 +47,16 @@ def walk(track=sys.stdin, force_index=False):
     if idx is None:
         regions = [None]
     else:
+        _, mapping = idx
         # Todo: Sort in a way that is compatible with existing wiggle tracks.
         #     Inspiration could be sorted BAM files. GATK requires these to be
         #     sorted according to the order in the reference file.
-        regions = sorted(idx)
+        regions = sorted(mapping)
 
     for expected_region in regions:
 
         if expected_region is not None:
-            track.seek(idx[expected_region])
+            track.seek(mapping[expected_region])
 
         for line in track:
 
@@ -194,19 +195,20 @@ def write(walker, track=sys.stdout, serializer=str):
     track.write(header)
     size += len(header)
 
-    idx = {}
+    # Todo: Populate summary.
+    summary = {'sum': 34000, 'count': 4343}
+    mapping = {}
     current_region = None
 
     for region, position, value in walker:
         if region != current_region:
-            idx[region] = size
+            mapping[region] = size
             chrom = 'variableStep chrom=%s\n' % region
             track.write(chrom)
             size += len(chrom)
             current_region = region
-        # Todo: See if float/int types both are represented correctly.
         step = '%d %s\n' % (position, serializer(value))
         track.write(step)
         size += len(step)
 
-    write_index(idx, track)
+    write_index(summary, mapping, track)

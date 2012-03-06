@@ -66,8 +66,9 @@ def main():
     args = parser.parse_args()
 
     if args.subcommand == 'index':
-        idx = index(args.track, force=True)
-        if write_index(idx, args.track) is None:
+        summary, mapping = index(args.track, force=True)
+        # Note that this writes the index twice if it does not yet exist.
+        if write_index(summary, mapping, args.track) is None:
             parser.error('Could not write index file')
 
     if args.subcommand == 'sort':
@@ -79,9 +80,11 @@ def main():
         write(merge(*walkers, merger=mergers[args.merger]))
 
     if args.subcommand == 'distance':
+        coverages = [index(track, force=True)[0]['sum'] for track in args.tracks]
+        # Todo: No indices is not an option here.
         walkers = [walk(track, force_index=not args.no_indices)
                    for track in args.tracks]
-        distances = distance(*walkers)
+        distances = distance(walkers, coverages)
         names = 'ABCDEFGH'
         sys.stdout.write('   ' + ' '.join('  %s ' % n for n in names[:len(args.tracks)]) + '\n')
         sys.stdout.write(names[0] + '    x\n')

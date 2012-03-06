@@ -16,6 +16,7 @@ from __future__ import division
 
 from collections import defaultdict
 
+from .index import index
 from .merge import merge
 
 
@@ -31,7 +32,7 @@ def pairwise_comparisons(count):
     return [(i, j) for i in range(1, count) for j in range(0, i)]
 
 
-def distance(*walkers):
+def distance(walkers, coverages):
     """
     Calculate the pairwise distances between wiggle tracks.
 
@@ -55,10 +56,9 @@ def distance(*walkers):
     .. todo:: Noise reduction with threshold.
     .. todo:: Choose pairwise comparison function.
     .. todo:: Can we refactor this by generalizing to a merge.pairwise?
+    .. todo:: Not creating the index is not an option here, update note on
+        assumption for this.
     """
-    # Temporary values, eventually this should be stored in the index.
-    coverages = [23688, 9105, 34243, 34243, 34243][:len(walkers)]
-
     comparisons = pairwise_comparisons(len(walkers))
 
     weights = dict(((left, right), getweights(coverages[left], coverages[right]))
