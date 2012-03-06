@@ -111,6 +111,7 @@ def index(track=sys.stdin, force=False):
     .. todo:: Also including the end positions would make it possible to do
         random jumps inside a region with some educated guessing. Perfect hits
         would not be possible, since the length of the lines are variable.
+    .. todo:: Also return index filename so we can check if it was written.
     """
     idx = read_index(track)
 

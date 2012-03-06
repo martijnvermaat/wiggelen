@@ -80,11 +80,7 @@ def main():
         write(merge(*walkers, merger=mergers[args.merger]))
 
     if args.subcommand == 'distance':
-        coverages = [index(track, force=True)[0]['sum'] for track in args.tracks]
-        # Todo: No indices is not an option here.
-        walkers = [walk(track, force_index=not args.no_indices)
-                   for track in args.tracks]
-        distances = distance(walkers, coverages)
+        distances = distance(*args.tracks)
         names = 'ABCDEFGH'
         sys.stdout.write('   ' + ' '.join('  %s ' % n for n in names[:len(args.tracks)]) + '\n')
         sys.stdout.write(names[0] + '    x\n')

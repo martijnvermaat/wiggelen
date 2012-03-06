@@ -16,39 +16,45 @@ from __future__ import division
 
 from collections import defaultdict
 
+from .wiggle import walk
 from .index import index
 from .merge import merge
 
 
-def getweights(coverage_left, coverage_right):
-    min_coverage = min(coverage_right, coverage_left)
-    return coverage_left / min_coverage, coverage_right / min_coverage
-
-
-def pairwise_comparisons(count):
+def normalize(*values):
     """
-    .. todo:: Optionally include self-comparisons and both directions.
+    Normalize values relative to the smallest value.
     """
-    return [(i, j) for i in range(1, count) for j in range(0, i)]
+    min_value = min(*values)
+    return [value / min_value for value in values]
 
 
-def distance(walkers, coverages):
+def matrix(size, reflexive=False, symmetric=False):
+    """
+    Create all coordinates in a square matrix.
+
+    :arg size: Width and height of the matrix.
+    :type size: int
+    :reflexive: Include coordinates on (x, x) diagonal.
+    :type reflexive: bool
+    :symmetric: Include coordinates (x, y) where x < y.
+
+    :return: All coordinates in the matrix as tuples.
+    :rtype: list(tuple(int, int))
+
+    .. todo:: Implement ``reflexive`` and ``symmetric``.
+    """
+    return [(i, j) for i in range(1, size) for j in range(0, i)]
+
+
+def distance(*tracks):
     """
     Calculate the pairwise distances between wiggle tracks.
 
-    This assumes the walkers have their regions in the same order. You can
-    force this by using indices. Example::
+    :arg tracks: List of wiggle tracks.
+    :type walkers: list(file)
 
-        >>> from wiggelen import walk
-        >>> from wiggelen.distance import distance
-        >>> walkers = [walk(track, force_index=True) for track in tracks]
-        >>> distance(*walkers)
-
-    :arg walkers: List of generators yielding tuples of (region, position,
-        value) per defined position.
-    :type walkers: list(generator(str, int, _))
-
-    :return: Pairwise distances between ``walkers``.
+    :return: Pairwise distances between ``tracks``.
     :rtype: list(int)
 
     .. todo:: This is not yet finished. For one thing, we need the summed
@@ -58,26 +64,46 @@ def distance(walkers, coverages):
     .. todo:: Can we refactor this by generalizing to a merge.pairwise?
     .. todo:: Not creating the index is not an option here, update note on
         assumption for this.
+    .. todo:: Check where this goes wrong if we cannot .seek() the tracks.
     """
-    comparisons = pairwise_comparisons(len(walkers))
+    walkers = [walk(track, force_index=True) for track in tracks]
 
-    weights = dict(((left, right), getweights(coverages[left], coverages[right]))
-                   for left, right in comparisons)
+    # We construct a list of comparisons for the merger, where each comparison
+    # is a tuple of (left, right, weight_left, weight_right).
+    comparisons = []
+    coverages = [index(track, force=True)[0]['sum'] for track in tracks]
+    for left, right in matrix(len(tracks)):
+        weight_left, weight_right = normalize(coverages[left], coverages[right])
+        comparisons.append( (left, right, weight_left, weight_right) )
 
+    # Pairwise distance function
+    distance_function = lambda x, y: abs(x - y) / ((x + 1) * (y + 1))
+
+    # The merger returns a matrix of values, one for each pairwise comparison.
     def merger(values):
         results = {}
-        for left, right in comparisons:
-            # Todo: None if both are undefined.
-            x = weights[left, right][0] * values[left] if values[left] else 0.0
-            y = weights[left, right][1] * values[right] if values[right] else 0.0
-            results[left, right] = float(abs(x - y)) / ((x + 1) * (y + 1))
+        for left, right, weight_left, weight_right in comparisons:
+            value_left, value_right = values[left], values[right]
+            if value_left is None and value_right is None:
+                result = None
+            else:
+                x = weight_left * value_left if value_left else 0
+                y = weight_right * value_right if value_right else 0
+                result = distance_function(x, y)
+            results[left, right] = result
         return results
 
-    counters = defaultdict(lambda : 0)
-    denominators = defaultdict(lambda : 1)
+    # Sum the results.
+    counters = defaultdict(lambda: 0)
+    denominators = defaultdict(lambda: 1)
     for _, _, values in merge(*walkers, merger=merger):
         for comparison, value in values.items():
-            counters[comparison] += value
-            denominators[comparison] += 1  # Todo: only count 1 where at least one of the two is defined
+            if value is not None:
+                counters[comparison] += value
+                denominators[comparison] += 1
 
-    return dict((c, counters[c] / denominators[c]) for c in comparisons)
+    # Distance matrix.
+    distances = {}
+    for comparison in counters:
+        distances[comparison] = counters[comparison] / denominators[comparison]
+    return distances
