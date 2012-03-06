@@ -16,7 +16,7 @@ import argparse
 from . import walk, write
 from .index import index, write_index
 from .merge import merge, mergers
-from .distance import distance
+from .distance import metrics, distance
 
 
 def main():
@@ -57,9 +57,8 @@ def main():
     dparser = subparsers.add_parser('distance',
         description='Calculate the distances between wiggle tracks.',
         help='calculate the distances between wiggle tracks')
-    dparser.add_argument('-n', '--no-indices', dest='no_indices',
-        action='store_true',
-        help='assume tracks are sorted, don\'t force building indices')
+    dparser.add_argument('-m', dest='metric', choices=metrics, default='a',
+        help='pairwise distance metric to use (default: %(default)s)')
     dparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track')
 
@@ -79,15 +78,24 @@ def main():
         write(merge(*walkers, merger=mergers[args.merger]))
 
     if args.subcommand == 'distance':
-        distances = distance(*args.tracks)
-        names = 'ABCDEFGH'
-        sys.stdout.write('   ' + ' '.join('  %s ' % n for n in names[:len(args.tracks)]) + '\n')
-        sys.stdout.write(names[0] + '    x\n')
+        distances = distance(*args.tracks, metric=metrics[args.metric])
+        def name(index):
+            return chr(ord('A') + index)
+        try:
+            sys.stdout.write(''.join('%s: %s\n' % (name(i), track.name)
+                                     for i, track in enumerate(args.tracks)))
+        except IOError:
+            pass
+        sys.stdout.write('\n   ')
+        sys.stdout.write(' '.join('   %s ' % name(i)
+                                  for i in range(len(args.tracks))))
+        sys.stdout.write('\n')
+        sys.stdout.write(name(0) + '     x\n')
         for i in range(1, len(args.tracks)):
-            sys.stdout.write('%s  ' % names[i])
+            sys.stdout.write('%s  ' % name(i))
             for j in range(0, i):
-                sys.stdout.write(' %.2f' % distances[i, j])
-            sys.stdout.write('  x\n')
+                sys.stdout.write(' %.3f' % distances[i, j])
+            sys.stdout.write('   x\n')
 
 
 if __name__ == '__main__':

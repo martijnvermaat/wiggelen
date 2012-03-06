@@ -20,7 +20,7 @@ Example:
 
     >>> import wiggelen
     >>> for x in wiggelen.walk(open('test.wig')):
-            print 'chr%s:%d\t%s' % x
+    ...     print 'chr%s:%d\t%s' % x
     chr18:34344  629.0
     chr18:34345  649.0
     chr18:34446  657.0

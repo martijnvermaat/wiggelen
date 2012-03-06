@@ -46,7 +46,7 @@ def merge(*walkers, **options):
     :arg walkers: List of generators yielding tuples of (region, position,
         value) per defined position.
     :type walkers: list(generator(str, int, _))
-    :keyword merger: Merge operation.
+    :keyword merger: Merge operation (default: sum).
     :type merger: function(list(_) -> _)
 
     :return: Tuples of (region, position, merged value) per defined position

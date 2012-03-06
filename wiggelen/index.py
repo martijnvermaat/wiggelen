@@ -6,7 +6,7 @@ summary data, the second is a mapping of regions and their positions in the
 wiggle track file.
 
 This data can be written to a file next to the wiggle track file (in case this
-is a regular file). Example of the serialization we use:
+is a regular file). Example of the serialization we use::
 
     #sum=4544353,count=63343
     1 47
@@ -16,7 +16,8 @@ is a regular file). Example of the serialization we use:
 
 .. todo:: Cache the index objects somehow during the process. Unfortunately,
     we cannot attach it to the track file handler, as it does not accept
-    additional attributes.
+    additional attributes. I guess we can do something based on the hash of
+    the file handler?
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -28,6 +29,9 @@ is a regular file). Example of the serialization we use:
 
 import sys
 
+
+#: Whether or not indices are written to a file.
+WRITE_INDEX = True
 
 #: Suffix used for index files.
 INDEX_SUFFIX = '.idx'
@@ -57,16 +61,21 @@ def write_index(summary, mapping, track=sys.stdout):
         not be written.
     :rtype: str
     """
+    if not WRITE_INDEX:
+        return
+
     filename = _index_filename(track)
 
-    if filename is not None:
-        try:
-            with open(filename, 'w') as f:
-                f.write('#' + ','.join('%s=%s' % d for d in summary.items()) + '\n')
-                f.write('\n'.join('%s %d' % i for i in mapping.items()) + '\n')
-                return filename
-        except IOError:
-            pass
+    if filename is None:
+        return
+
+    try:
+        with open(filename, 'w') as f:
+            f.write('#' + ','.join('%s=%s' % d for d in summary.items()) + '\n')
+            f.write('\n'.join('%s %d' % i for i in mapping.items()) + '\n')
+        return filename
+    except IOError:
+        pass
 
 
 def read_index(track=sys.stdin):
@@ -84,15 +93,17 @@ def read_index(track=sys.stdin):
     """
     filename = _index_filename(track)
 
-    if filename is not None:
-        try:
-            with open(filename) as f:
-                summary = dict((k, float(v)) for k, v in
-                               (d.split('=') for d in next(f)[1:-1].split(',')))
-                mapping = dict((r, int(p)) for r, p in (l.split() for l in f))
-                return summary, mapping
-        except IOError:
-            pass
+    if filename is None:
+        return
+
+    try:
+        with open(filename) as f:
+            summary = dict((k, float(v)) for k, v in
+                           (d.split('=') for d in next(f)[1:-1].split(',')))
+            mapping = dict((r, int(p)) for r, p in (l.split() for l in f))
+        return summary, mapping
+    except IOError:
+        pass
 
 
 def index(track=sys.stdin, force=False):

@@ -2,7 +2,9 @@
 Calculate the distance between two wiggle tracks using a metric designed for
 multisets.
 
-.. todo: Perhaps we should just put all this in the wiggelen.merge module.
+This module implements the algorithm from the `wiggledist <https://humgenprojects.lumc.nl/trac/wiggledist/>`_
+program, an efficient tool to assess similarity of next generation sequencing
+datasets.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -19,6 +21,21 @@ from collections import defaultdict
 from .wiggle import walk
 from .index import index
 from .merge import merge
+
+
+# Todo: Give these metrics a name.
+_metric_a = lambda x, y : abs(x - y) / ((x + 1) * (y + 1))
+_metric_b = lambda x, y : abs(x - y) / (x + y + 1)
+_metric_c = lambda x, y : (max(x, y) * abs(x - y)) \
+                          / (((x * x) + 1) * ((y * y) + 1))
+_metric_d = lambda x, y : abs(x - y) / (max(x, y) + 1)
+
+
+#: Predefined pairwise distance metrics.
+metrics = {'a': _metric_a,
+           'b': _metric_b,
+           'c': _metric_c,
+           'd': _metric_d}
 
 
 def normalize(*values):
@@ -52,18 +69,21 @@ def matrix(size, reflexive=False, symmetric=False):
 
     .. todo:: Implement ``reflexive`` and ``symmetric``.
     """
-    return [(i, j) for i in range(1, size) for j in range(0, i)]
+    return [(i, j) for i in range(1, size) for j in range(i)]
 
 
-def distance(*tracks):
+def distance(*tracks, **options):
     """
     Calculate the pairwise distances between wiggle tracks.
 
     :arg tracks: List of wiggle tracks.
     :type walkers: list(file)
+    :keyword metric: Pairwise distance metric (default: a).
+    :type merger: function(float, float -> float)
 
-    :return: Pairwise distances between ``tracks``.
-    :rtype: list(int)
+    :return: Pairwise distances between ``tracks`` as a mapping from
+        coordinates in the distance matrix to their values.
+    :rtype: dict((int, int), float)
 
     .. todo:: This is not yet finished. For one thing, we need the summed
         values per track, which we don't store in the index at the moment.
@@ -74,18 +94,15 @@ def distance(*tracks):
         assumption for this.
     .. todo:: Check where this goes wrong if we cannot .seek() the tracks.
     """
-    walkers = [walk(track, force_index=True) for track in tracks]
+    metric = options.get('metric', metrics['a'])
 
     # We construct a list of comparisons for the merger, where each comparison
     # is a tuple of (left, right, weight_left, weight_right).
     comparisons = []
-    coverages = [index(track, force=True)[0]['sum'] for track in tracks]
+    sums = [index(track, force=True)[0]['sum'] for track in tracks]
     for left, right in matrix(len(tracks)):
-        weight_left, weight_right = normalize(coverages[left], coverages[right])
+        weight_left, weight_right = normalize(sums[left], sums[right])
         comparisons.append( (left, right, weight_left, weight_right) )
-
-    # Pairwise distance function
-    distance_function = lambda x, y: abs(x - y) / ((x + 1) * (y + 1))
 
     # The merger returns a matrix of values, one for each pairwise comparison.
     def merger(values):
@@ -97,21 +114,24 @@ def distance(*tracks):
             else:
                 x = weight_left * value_left if value_left else 0
                 y = weight_right * value_right if value_right else 0
-                result = distance_function(x, y)
+                result = metric(x, y)
             results[left, right] = result
         return results
 
-    # Sum the results.
-    counters = defaultdict(lambda: 0)
-    denominators = defaultdict(lambda: 1)
+    # Indexed walkers.
+    walkers = [walk(track, force_index=True) for track in tracks]
+
+    # Aggregate results.
+    totals = defaultdict(lambda: 0)
+    counts = defaultdict(lambda: 1)
     for _, _, values in merge(*walkers, merger=merger):
         for comparison, value in values.items():
             if value is not None:
-                counters[comparison] += value
-                denominators[comparison] += 1
+                totals[comparison] += value
+                counts[comparison] += 1
 
-    # Distance matrix.
+    # Create the distance matrix by taking the averages.
     distances = {}
-    for comparison in counters:
-        distances[comparison] = counters[comparison] / denominators[comparison]
+    for comparison in counts:
+        distances[comparison] = totals[comparison] / counts[comparison]
     return distances
