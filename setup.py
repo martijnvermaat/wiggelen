@@ -16,7 +16,7 @@ except ImportError:
 import wiggelen as distmeta
 
 setup(
-    name='Wiggelen',
+    name='wiggelen',
     version=distmeta.__version__,
     description='Working with wiggle tracks in Python',
     long_description=distmeta.__doc__,
