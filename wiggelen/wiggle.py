@@ -11,6 +11,7 @@ scores, read depth, and transcriptome data.
     that valid wiggle tracks only have int or float values.
 .. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
     ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
+.. todo: Note that positioning is one-based.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -76,7 +77,10 @@ def walk(track=sys.stdin, force_index=False):
 
         for line in track:
 
-            if line.startswith('browser') or line.startswith('track'):
+            if line.startswith('browser') or line.startswith('track') \
+                   or line.startswith('#') or line.isspace():
+                # As far as I can see empty lines and comments are not allowed
+                # by the spec, but I guess they exist in the real world.
                 pass
 
             elif line.startswith('variableStep'):

@@ -109,3 +109,11 @@ class TestWiggle(object):
         for expected, item in zip(b, walker):
             assert_equal(expected, item)
         assert_raises(StopIteration, next, walker)
+
+    def test_walk_complex(self):
+        """
+        Walk over a complex track.
+        """
+        walker = wiggelen.walk(open_('complex.wig'))
+        for _ in walker:
+            pass
