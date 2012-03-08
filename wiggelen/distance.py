@@ -138,7 +138,7 @@ def distance(*tracks, **options):
     comparisons = []
     sums = [index(track, force=True)[0]['sum'] for track in tracks]
     for left, right in matrix(len(tracks)):
-        weight_left, weight_right = normalize(sums[left], sums[right])
+        weight_right, weight_left = normalize(sums[left], sums[right])
         comparisons.append( (left, right, weight_left, weight_right) )
 
     # The merger returns a matrix of values, one for each pairwise comparison.
