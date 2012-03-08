@@ -72,7 +72,10 @@ def main():
     dparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track')
 
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except IOError as e:
+        parser.error(str(e))
 
     if args.subcommand == 'index':
         summary, mapping, filename = index(args.track, force=True)
