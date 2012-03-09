@@ -210,6 +210,71 @@ filter_ = itertools.ifilter
 map_ = itertools.imap
 
 
+def fill(walker, regions=None):
+    """
+    Fill in undefined positions with None values.
+
+    :arg walker: Tuple of (region, position, value) per defined position.
+    :type walker: generator(str, int, _)
+    :arg start: ?
+    :type start: int
+    :arg stop: ?
+    :type stop: int
+
+    :return: Tuples of (region, position, value) per defined position.
+    :rtype: generator(str, int, _)
+    """
+    #regions = {'1': (1, 4545435), 'MT': (1, 16569)}
+
+    previous_region = previous_position = None
+
+    for region, position, value in walker:
+        if region != previous_region:
+            # Backlog.
+            if regions is not None:
+                try:
+                    start, stop = regions[previous_region]
+                    for p in xrange(max(previous_position + 1, start), stop + 1):
+                        yield previous_region, p, None
+                except KeyError:
+                    pass
+            previous_region = region
+            if regions is not None:
+                try:
+                    start, stop = regions[region]
+                    #previous_position = start-1
+                    for p in xrange(start, min(position, stop + 1)):
+                        yield region, p, None
+                except KeyError:
+                    pass
+        else:
+            if regions is None:
+                #start = previous_position + 1
+                #stop = position - 1
+                for p in xrange(previous_position + 1, position):
+                    yield region, p, None
+            else:
+                try:
+                    start, stop = regions[region]
+                    for p in xrange(max(previous_position + 1, start), min(position, stop + 1)):
+                        yield region, p, None
+                except KeyError:
+                    pass
+
+        previous_position = position
+
+        yield region, position, value
+
+    # Backlog.
+    if regions is not None:
+        try:
+            start, stop = regions[previous_region]
+            for p in xrange(max(previous_position + 1, start), stop + 1):
+                yield previous_region, p, None
+        except KeyError:
+            pass
+
+
 def write(walker, track=sys.stdout, serializer=str):
     """
     Write items from a walker to a wiggle track.
