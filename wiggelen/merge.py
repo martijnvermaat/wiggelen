@@ -21,7 +21,7 @@ Merger ``count``: Compute the number of defined values.
 
 from __future__ import division
 
-from .wiggle import walk_together
+from .wiggle import group
 
 
 # Compute the sum of all values.
@@ -71,5 +71,5 @@ def merge(*walkers, **options):
     """
     merger = options.get('merger', mergers['sum'])
 
-    for region, position, values in walk_together(*walkers):
+    for region, position, values in group(*walkers):
         yield region, position, merger(values)

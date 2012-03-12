@@ -132,7 +132,7 @@ def walk(track=sys.stdin, force_index=False):
                 raise Exception('Could not parse line: %s' % line)
 
 
-def walk_together(*walkers):
+def group(*walkers):
     """
     Walk over all tracks simultaneously and for each position yield the
     region, position and a list of values for each track, or ``None`` in case
@@ -152,7 +152,7 @@ def walk_together(*walkers):
 
     Example::
 
-        >>> for x in walk_together(walk(open('a.wig')), walk(open('b.wig'))):
+        >>> for x in group(walk(open('a.wig')), walk(open('b.wig'))):
         ...     x
         ('18', 7, [29.0, None])
         ('18', 8, [49.0, None])
