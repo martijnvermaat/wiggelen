@@ -131,6 +131,9 @@ def walk(track=sys.stdin, force_index=False):
             else:
                 raise Exception('Could not parse line: %s' % line)
 
+    # Todo: Automatically build the index (if we read the whole file) and
+    # write it to a file?
+
 
 def group(*walkers):
     """
