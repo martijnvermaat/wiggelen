@@ -5,8 +5,6 @@ The `wiggle (WIG) format <https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html>`
 is for storing dense, continuous genomic data such as GC percent, probability
 scores, read depth, and transcriptome data.
 
-.. todo: Implement by_region(walker) that iterates over the regions and yields
-    a walker for each?
 .. todo: Note in the documentation that walker values can be of any type, but
     that valid wiggle tracks only have int or float values.
 .. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
@@ -219,16 +217,16 @@ def fill(walker, regions=None):
 
     :arg walker: Tuple of (region, position, value) per defined position.
     :type walker: generator(str, int, _)
-    :arg start: ?
-    :type start: int
-    :arg stop: ?
-    :type stop: int
+    :arg regions: Dictionary with regions as keys and (start, stop) tuples as
+        values. If not ``None``, fill positions from start to stop (both
+        including) in these regions. If ``None``, fill positions in all
+        regions between their first and last defined positions.
+    :type regions: dict(str, (int, int))
 
-    :return: Tuples of (region, position, value) per defined position.
+    :return: Tuples of (region, position, value) per position where value is
+        ``None`` if it was not defined in the original ``walker``.
     :rtype: generator(str, int, _)
     """
-    #regions = {'1': (1, 4545435), 'MT': (1, 16569)}
-
     previous_region = previous_position = None
 
     for region, position, value in walker:
@@ -242,30 +240,30 @@ def fill(walker, regions=None):
                 except KeyError:
                     pass
             previous_region = region
-            if regions is not None:
-                try:
-                    start, stop = regions[region]
-                    #previous_position = start-1
-                    for p in xrange(start, min(position, stop + 1)):
-                        yield region, p, None
-                except KeyError:
-                    pass
-        else:
-            if regions is None:
-                #start = previous_position + 1
-                #stop = position - 1
+            previous_position = None
+
+        if regions is None:
+            # No explicitely specified regions, fill everything.
+            if previous_position is not None:
                 for p in xrange(previous_position + 1, position):
                     yield region, p, None
-            else:
-                try:
-                    start, stop = regions[region]
-                    for p in xrange(max(previous_position + 1, start), min(position, stop + 1)):
+        else:
+            try:
+                # Specified where we must fill.
+                start, stop = regions[region]
+                if previous_position is None:
+                    for p in xrange(start, min(position, stop + 1)):
                         yield region, p, None
-                except KeyError:
-                    pass
+                else:
+                    for p in xrange(max(previous_position + 1, start),
+                                    min(position, stop + 1)):
+                        yield region, p, None
+            except KeyError:
+                # Region is not in explicitely specified regions, don't
+                # fill it.
+                pass
 
         previous_position = position
-
         yield region, position, value
 
     # Backlog.
