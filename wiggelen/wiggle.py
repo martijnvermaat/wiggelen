@@ -133,7 +133,7 @@ def walk(track=sys.stdin, force_index=False):
     # write it to a file?
 
 
-def group(*walkers):
+def zip_(*walkers):
     """
     Walk over all tracks simultaneously and for each position yield the
     region, position and a list of values for each track, or ``None`` in case
@@ -153,7 +153,7 @@ def group(*walkers):
 
     Example::
 
-        >>> for x in group(walk(open('a.wig')), walk(open('b.wig'))):
+        >>> for x in zip_(walk(open('a.wig')), walk(open('b.wig'))):
         ...     x
         ('18', 7, [29.0, None])
         ('18', 8, [49.0, None])

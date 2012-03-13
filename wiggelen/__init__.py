@@ -13,7 +13,7 @@ Wiggelen, working with wiggle tracks in Python.
 """
 
 
-from .wiggle import walk, group, map_, filter_, fill, write
+from .wiggle import walk, zip_, map_, filter_, fill, write
 
 
 # On the event of a new release, we update the __version_info__ package
@@ -40,4 +40,4 @@ __contact__ = 'm.vermaat.hg@lumc.nl'
 __homepage__ = 'http://www.humgen.nl'
 
 
-__all__ = ['walk', 'group', 'map_', 'filter_', 'fill', 'write']
+__all__ = ['walk', 'zip_', 'map_', 'filter_', 'fill', 'write']
