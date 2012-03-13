@@ -224,8 +224,26 @@ def fill(walker, regions=None):
     :type regions: dict(str, (int, int))
 
     :return: Tuples of (region, position, value) per position where value is
-        ``None`` if it was not defined in the original ``walker``.
+        ``None`` if it was not defined in the original walker.
     :rtype: generator(str, int, _)
+
+    Example::
+
+        >>> for x in walk(open('a.wig')):
+        ...     x
+        ('MT', 3, 29.0)
+        ('MT', 5, 49.0)
+        ('MT', 8, 87.0)
+        ('MT', 9, 20.0)
+        >>> for x in fill(walk(open('a.wig')):
+        ...     x
+        ('MT', 3, 29.0)
+        ('MT', 4, None)
+        ('MT', 5, 49.0)
+        ('MT', 6, None)
+        ('MT', 7, None)
+        ('MT', 8, 87.0)
+        ('MT', 9, 20.0)
     """
     previous_region = previous_position = None
 
