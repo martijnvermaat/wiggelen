@@ -88,7 +88,7 @@ def walk(track=sys.stdin, force_index=False):
                     region = fields['chrom']
                     span = fields.get('span', 1)
                     format_ = 'variable'
-                except ValueError, KeyError:
+                except (ValueError, KeyError):
                     raise Exception('Could not parse line: %s' % line)
                 if expected_region is not None and region != expected_region:
                     break
@@ -102,7 +102,7 @@ def walk(track=sys.stdin, force_index=False):
                     step = int(fields['step'])
                     span = int(fields.get('span', 1))
                     format_ = 'fixed'
-                except ValueError, KeyError:
+                except (ValueError, KeyError):
                     raise Exception('Could not parse line: %s' % line)
                 if expected_region is not None and region != expected_region:
                     break
