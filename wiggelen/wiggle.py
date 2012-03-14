@@ -236,6 +236,11 @@ def fill(walker, regions=None):
         ('MT', 7, None)
         ('MT', 8, 87.0)
         ('MT', 9, 20.0)
+
+    .. note:: This might be a tiny bit memory-hungry on Python 2.x if there
+        are *very* large gaps to fill since we use the range function to
+        generate the positions. I don't think it's worth it to add version
+        specific code paths for this.
     """
     previous_region = previous_position = None
 
@@ -245,7 +250,7 @@ def fill(walker, regions=None):
             if regions is not None:
                 try:
                     start, stop = regions[previous_region]
-                    for p in xrange(max(previous_position + 1, start), stop + 1):
+                    for p in range(max(previous_position + 1, start), stop + 1):
                         yield previous_region, p, None
                 except KeyError:
                     pass
@@ -255,17 +260,17 @@ def fill(walker, regions=None):
         if regions is None:
             # No explicitely specified regions, fill everything.
             if previous_position is not None:
-                for p in xrange(previous_position + 1, position):
+                for p in range(previous_position + 1, position):
                     yield region, p, None
         else:
             try:
                 # Specified where we must fill.
                 start, stop = regions[region]
                 if previous_position is None:
-                    for p in xrange(start, min(position, stop + 1)):
+                    for p in range(start, min(position, stop + 1)):
                         yield region, p, None
                 else:
-                    for p in xrange(max(previous_position + 1, start),
+                    for p in range(max(previous_position + 1, start),
                                     min(position, stop + 1)):
                         yield region, p, None
             except KeyError:
@@ -280,7 +285,7 @@ def fill(walker, regions=None):
     if regions is not None:
         try:
             start, stop = regions[previous_region]
-            for p in xrange(max(previous_position + 1, start), stop + 1):
+            for p in range(max(previous_position + 1, start), stop + 1):
                 yield previous_region, p, None
         except KeyError:
             pass
