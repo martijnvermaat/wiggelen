@@ -10,6 +10,7 @@ scores, read depth, and transcriptome data.
 .. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
     ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
 .. todo: Note that positioning is one-based.
+.. todo: Note in manual that itertools.ifilter and itertools.imap are useful.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
@@ -20,7 +21,6 @@ scores, read depth, and transcriptome data.
 
 
 import sys
-import itertools
 
 from .index import index, write_index
 
@@ -201,14 +201,6 @@ def zip_(*walkers):
                     items[i] = next(walkers[i])
                 except StopIteration:
                     items[i] = None
-
-
-#: Filter items from a walker.
-filter_ = itertools.ifilter
-
-
-#: Map items from a walker.
-map_ = itertools.imap
 
 
 def fill(walker, regions=None):

@@ -13,10 +13,17 @@ Licensed under the MIT license, see the LICENSE file.
 import sys
 import argparse
 
-from .wiggle import walk, write, map_
+from .wiggle import walk, write
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
+
+# Python 3 compatibility.
+try:
+    from itertools import imap
+    map_ = imap
+except ImportError:
+    map_ = map
 
 
 def main():
