@@ -4,7 +4,7 @@ python:
   - "2.6"
   - "2.7"
   - "3.2"
-# command to install dependencies (we use true as a no-op)
-install: true
-# command to run tests
+install:
+  - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors argparse; fi"
+  - python setup.py install
 script: nosetests
