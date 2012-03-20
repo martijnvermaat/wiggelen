@@ -29,6 +29,8 @@ is a regular file). Example of the serialization we use::
 
 import sys
 
+from ._parse import LineType, create_state, parse
+
 
 #: Whether or not indices are written to a file.
 WRITE_INDEX = True
@@ -136,45 +138,19 @@ def index(track=sys.stdin, force=False):
 
     summary = {'sum': 0, 'count': 0}
     mapping = {}
-    format_ = span = None
+
+    state = create_state()
+
     while True:
         line = track.readline()
         if not line:
             break
-        if line.startswith('browser') or line.startswith('track'):
-            pass
-        elif line.startswith('variableStep'):
-            region = line.split('chrom=')[1].split()[0]
-            mapping[region] = track.tell() - len(line)
-            try:
-                span = line.split('span=')[1].split()[0]
-            except IndexError:
-                span = 1
-            format_ = 'variable'
-        elif line.startswith('fixedStep'):
-            region = line.split('chrom=')[1].split()[0]
-            mapping[region] = track.tell() - len(line)
-            try:
-                span = line.split('span=')[1].split()[0]
-            except IndexError:
-                span = 1
-            format_ = 'fixed'
-        elif format_ == 'variable':
-            try:
-                position, value = line.split()
-                value = float(value) if '.' in value else int(value)
-            except ValueError:
-                raise Exception('Could not parse line: %s' % line)
-            summary['count'] += 1 * span
-            summary['sum'] += value * span
-        elif format_ == 'fixed':
-            try:
-                value = float(line) if '.' in line else int(line)
-            except ValueError:
-                raise Exception('Could not parse line: %s' % line)
-            summary['count'] += 1 * span
-            summary['sum'] += value * span
-        else:
-            raise Exception('Could not parse line: %s' % line)
+        line_type, data = parse(line, state)
+
+        if line_type == LineType.REGION:
+            mapping[data] = track.tell() - len(line)
+        elif line_type == LineType.DATA:
+            summary['count'] += data.span
+            summary['sum'] += data.value * data.span
 
     return summary, mapping, write_index(summary, mapping, track)

@@ -21,81 +21,9 @@ scores, read depth, and transcriptome data.
 
 
 import sys
-from collections import namedtuple
 
+from ._parse import LineType, create_state, parse
 from .index import index, write_index
-
-
-class ParseError(Exception):
-    pass
-
-
-# Line types.
-class LineType(object):
-    NONE, REGION, VALUE = range(3)
-
-
-# Track modes.
-class Mode(object):
-    VARIABLE, FIXED = range(2)
-
-
-create_state = dict(mode=Mode.VARIABLE, span=1, start=None, step=None)
-
-
-def _parse(line, state):
-    # Parse a line and return a tuple (type, data). The state dictionary is
-    # modified and should be passed as such with the next call.
-    if line.startswith('browser') or line.startswith('track') \
-           or line.startswith('#') or line.isspace():
-        # As far as I can see empty lines and comments are not allowed
-        # by the spec, but I guess they exist in the real world.
-        return LineType.IGNORE, None
-
-    if line.startswith('variableStep'):
-        try:
-            fields = dict(map(lambda field: field.split('='),
-                              line[len('variableStep'):].split()))
-            state['mode'] = Mode.VARIABLE
-            state['span'] = int(fields.get('span', 1))
-            return LineType.REGION, fields['chrom']
-        except (ValueError, KeyError):
-            raise ParseError('Could not parse line: %s' % line)
-
-    if line.startswith('fixedStep'):
-        try:
-            fields = dict(map(lambda field: field.split('='),
-                              line[len('fixedStep'):].split()))
-            state['mode'] = Mode.VARIABLE
-            state['start'] = int(fields['start'])
-            state['step'] = int(fields['step'])
-            state['span'] = int(fields.get('span', 1))
-            return LineType.REGION, fields['chrom']
-        except (ValueError, KeyError):
-            raise ParseError('Could not parse line: %s' % line)
-
-    if state['mode'] == Mode.VARIABLE:
-        try:
-            position, value = line.split()
-            return LineType.VALUE, dict(
-                position=int(position),
-                span=state['span'],
-                value=float(value) if '.' in value else int(value))
-        except ValueError:
-            raise ParseError('Could not parse line: %s' % line)
-
-    if state['mode'] == Mode.FIXED:
-        try:
-            value = float(line) if '.' in line else int(line)
-            state['start'] += state['step']
-            return LineType.VALUE, dict(
-                position=start,
-                span=state['span'],
-                value=value)
-        except ValueError:
-            raise ParseError('Could not parse line: %s' % line)
-
-    raise ParseError('Could not parse line: %s' % line)
 
 
 def walk(track=sys.stdin, force_index=False):
@@ -128,7 +56,7 @@ def walk(track=sys.stdin, force_index=False):
     .. todo:: Prettify this code.
     .. todo:: Detect if index does not agree with track.
     """
-    format_ = region = start = step = span = None
+    region = None
 
     idx = index(track, force=force_index)
 
@@ -146,61 +74,17 @@ def walk(track=sys.stdin, force_index=False):
         if expected_region is not None:
             track.seek(mapping[expected_region])
 
+        state = create_state()
+
         for line in track:
-
-            if line.startswith('browser') or line.startswith('track') \
-                   or line.startswith('#') or line.isspace():
-                # As far as I can see empty lines and comments are not allowed
-                # by the spec, but I guess they exist in the real world.
-                pass
-
-            elif line.startswith('variableStep'):
-                try:
-                    fields = dict(map(lambda field: field.split('='),
-                                      line[len('variableStep'):].split()))
-                    region = fields['chrom']
-                    span = fields.get('span', 1)
-                    format_ = 'variable'
-                except (ValueError, KeyError):
-                    raise Exception('Could not parse line: %s' % line)
+            line_type, data = parse(line, state)
+            if line_type == LineType.REGION:
+                region = data
                 if expected_region is not None and region != expected_region:
                     break
-
-            elif line.startswith('fixedStep'):
-                try:
-                    fields = dict(map(lambda field: field.split('='),
-                                      line[len('fixedStep'):].split()))
-                    region = fields['chrom']
-                    start = int(fields['start'])
-                    step = int(fields['step'])
-                    span = int(fields.get('span', 1))
-                    format_ = 'fixed'
-                except (ValueError, KeyError):
-                    raise Exception('Could not parse line: %s' % line)
-                if expected_region is not None and region != expected_region:
-                    break
-
-            elif format_ == 'variable':
-                try:
-                    position, value = line.split()
-                    position = int(position)
-                    value = float(value) if '.' in value else int(value)
-                except ValueError:
-                    raise Exception('Could not parse line: %s' % line)
-                for i in range(span):
-                    yield region, position + i, value
-
-            elif format_ == 'fixed':
-                try:
-                    value = float(line) if '.' in line else int(line)
-                except ValueError:
-                    raise Exception('Could not parse line: %s' % line)
-                for i in range(span):
-                    yield region, start + i, value
-                start += step
-
-            else:
-                raise Exception('Could not parse line: %s' % line)
+            elif line_type == LineType.DATA:
+                for i in range(data.span):
+                    yield region, data.position + i, data.value
 
     # Todo: Automatically build the index (if we read the whole file) and
     # write it to a file?

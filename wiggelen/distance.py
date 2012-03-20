@@ -33,7 +33,7 @@ from __future__ import division
 
 from collections import defaultdict
 
-from .wiggle import walk
+from ._wiggle import walk
 from .index import index
 from .merge import merge
 

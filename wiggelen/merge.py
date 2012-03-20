@@ -21,7 +21,7 @@ Merger ``count``: Compute the number of defined values.
 
 from __future__ import division
 
-from .wiggle import zip_
+from ._wiggle import zip_
 
 
 # Compute the sum of all values.
