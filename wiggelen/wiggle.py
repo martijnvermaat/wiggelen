@@ -22,7 +22,7 @@ scores, read depth, and transcriptome data.
 
 import sys
 
-from ._parse import LineType, create_state, parse
+from .parse import LineType, create_state, parse
 from .index import index, write_index
 
 

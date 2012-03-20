@@ -13,8 +13,8 @@ Wiggelen, working with wiggle tracks in Python.
 """
 
 
-from ._parse import ParseError
-from ._wiggle import walk, zip_, fill, write
+from .parse import ParseError
+from .wiggle import walk, zip_, fill, write
 
 
 # On the event of a new release, we update the __version_info__ package
@@ -39,6 +39,3 @@ __version__ = '.'.join(__version_info__)
 __author__ = 'LUMC, Martijn Vermaat, Jeroen Laros'
 __contact__ = 'm.vermaat.hg@lumc.nl'
 __homepage__ = 'http://www.humgen.nl'
-
-
-__all__ = ['ParseError', 'walk', 'zip_', 'fill', 'write']

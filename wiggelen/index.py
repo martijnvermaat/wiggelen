@@ -29,7 +29,7 @@ is a regular file). Example of the serialization we use::
 
 import sys
 
-from ._parse import LineType, create_state, parse
+from .parse import LineType, create_state, parse
 
 
 #: Whether or not indices are written to a file.

@@ -13,7 +13,7 @@ Licensed under the MIT license, see the LICENSE file.
 import sys
 import argparse
 
-from ._wiggle import walk, write
+from .wiggle import walk, write
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
