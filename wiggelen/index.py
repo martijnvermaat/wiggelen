@@ -168,6 +168,8 @@ def index(track=sys.stdin, force=False):
             idx[region]['sum'] += data.value * data.span
             idx[region]['count'] += data.span
 
+    # Todo: Technically, start of _all is not 0 since we always have a track
+    # line in the file.
     idx['_all'] = {
         'region': '_all',
         'start':  0,

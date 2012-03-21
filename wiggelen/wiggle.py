@@ -63,16 +63,15 @@ def walk(track=sys.stdin, force_index=False):
     if idx is None:
         regions = [None]
     else:
-        _, mapping, _ = idx
         # Todo: Sort in a way that is compatible with existing wiggle tracks.
         #     Inspiration could be sorted BAM files. GATK requires these to be
         #     sorted according to the order in the reference file.
-        regions = sorted(mapping)
+        regions = sorted(r for r in idx if r != '_all')
 
     for expected_region in regions:
 
         if expected_region is not None:
-            track.seek(mapping[expected_region])
+            track.seek(idx[expected_region]['start'])
 
         state = create_state()
 
@@ -280,21 +279,35 @@ def write(walker, track=sys.stdout, serializer=str):
     track.write(header)
     size += len(header)
 
-    summary = {'sum': 0, 'count': 0}
-    mapping = {}
+    idx = {}
     current_region = None
 
     for region, position, value in walker:
         if region != current_region:
-            mapping[region] = size
-            chrom = 'variableStep chrom=%s\n' % region
-            track.write(chrom)
-            size += len(chrom)
+            line = 'variableStep chrom=%s\n' % region
+            track.write(line)
+            idx[region] = {
+                'region': region,
+                'start':  size,
+                'stop':   size + len(line),
+                'sum':    0,
+                'count':  0}
+            size += len(line)
             current_region = region
-        step = '%d %s\n' % (position, serializer(value))
-        track.write(step)
-        size += len(step)
-        summary['sum'] += value
-        summary['count'] += 1
+        line = '%d %s\n' % (position, serializer(value))
+        track.write(line)
+        idx[region]['stop'] = size + len(line)
+        idx[region]['sum'] += value
+        idx[region]['count'] += 1
+        size += len(line)
 
-    write_index(summary, mapping, track)
+    # Todo: Technically, start of _all is not 0 since we always have a track
+    # line in the file.
+    idx['_all'] = {
+        'region': '_all',
+        'start':  0,
+        'stop':   size,
+        'sum':    sum(r['sum'] for r in idx.values()),
+        'count':  sum(r['count'] for r in idx.values())}
+
+    write_index(idx, track)
