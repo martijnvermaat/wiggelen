@@ -1,6 +1,10 @@
 """
 Wiggelen, working with wiggle tracks in Python.
 
+The `wiggle (WIG) format <https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html>`_
+is for storing dense, continuous genomic data such as GC percent, probability
+scores, read depth, and transcriptome data.
+
 .. todo:: Specify region(s) to use (same as filter?), possibly with a BED file.
 .. todo:: Conversion to BigWig.
 .. todo:: Connect with numpy/pandas.

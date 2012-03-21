@@ -1,10 +1,6 @@
 """
 Read and write wiggle tracks.
 
-The `wiggle (WIG) format <https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html>`_
-is for storing dense, continuous genomic data such as GC percent, probability
-scores, read depth, and transcriptome data.
-
 .. todo: Note in the documentation that walker values can be of any type, but
     that valid wiggle tracks only have int or float values.
 .. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
