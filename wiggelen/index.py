@@ -1,18 +1,27 @@
 """
 Index regions/chromosomes in wiggle tracks for random access.
 
-Indexing a wiggle track results in two dictionaries: the first contains some
-summary data, the second is a mapping of regions and their positions in the
-wiggle track file.
+Indexing a wiggle track results in a mapping of regions to summaries. The
+summaries are dictionaries including start and stop positions and some
+statistical metrics. A summary for the entire wiggle track is included as the
+special region ``_all``.
 
 This data can be written to a file next to the wiggle track file (in case this
 is a regular file). Example of the serialization we use::
 
-    #sum=4544353,count=63343
-    1 47
-    X 3433
-    Y 8743
-    MT 10362
+    region=_all,start=0,stop=12453,sum=4544353,count=63343
+    region=1,start=47,stop=3433,sum=4353,count=643
+    region=X,start=3433,stop=8743,sum=454,count=343
+    region=Y,start=8743,stop=10362,sum=7353,count=343
+    region=MT,start=10362,stop=12453,sum=353,count=143
+
+Note that we do not impose a certain order on the lines in the index or the
+fields on a line. Field values are tried to be parsed as int, float or string,
+in that order.
+
+.. todo:: Add some other metrics to the index (standard deviation, min, max).
+
+.. todo:: Mechanism to include custom metrics in the index?
 
 .. todo:: Cache the index objects somehow during the process. Unfortunately,
     we cannot attach it to the track file handler, as it does not accept
@@ -87,9 +96,8 @@ def read_index(track=sys.stdin):
     :arg track: Wiggle track the index belongs to.
     :type track: file
 
-    :return: Wiggle track summary and mapping, or ``None`` if the index could
-        not be read.
-    :rtype: dict(str, _), dict(str, int)
+    :return: Wiggle track index, or ``None`` if the index could not be read.
+    :rtype: dict(str, dict(str, _))
 
     .. todo:: Only accept if index is newer than wiggle track?
     """
@@ -100,9 +108,14 @@ def read_index(track=sys.stdin):
 
     try:
         with open(filename) as f:
+#           idx = {}
+#            for line in f:
+#                data = dict((k, v) for k, v in
+#                           (d.split('=') for d in line[:-1].split(',')))
+
             summary = dict((k, float(v)) for k, v in
                            (d.split('=') for d in next(f)[1:-1].split(',')))
-            mapping = dict((r, int(p)) for r, p in (l.split() for l in f))
+            idx = dict((r, dict(d)) for r, d in (l.split() for l in f))
         return summary, mapping
     except IOError:
         pass
