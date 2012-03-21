@@ -1,12 +1,12 @@
 """
 Read and write wiggle tracks.
 
-.. todo: Note in the documentation that walker values can be of any type, but
+.. todo:: Note in the documentation that walker values can be of any type, but
     that valid wiggle tracks only have int or float values.
-.. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
+.. todo:: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
     ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
-.. todo: Note that positioning is one-based.
-.. todo: Note in manual that itertools.ifilter and itertools.imap are useful.
+.. todo:: Note that positioning is one-based.
+.. todo:: Note in manual that itertools.ifilter and itertools.imap are useful.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
