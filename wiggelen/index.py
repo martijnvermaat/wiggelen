@@ -114,8 +114,8 @@ def read_index(track=sys.stdin):
         with open(filename) as f:
             idx = {}
             for line in f:
-                data = dict((k, _cast(k, v)) for k, v in
-                            (d.split('=') for d in line.rstrip().split(',')))
+                data = dict((k, _cast(k, v)) for d in line.rstrip().split(',')
+                            for k, v in d.split('='))
                 idx[data['region']] = data
             return idx
     except IOError:
@@ -167,5 +167,12 @@ def index(track=sys.stdin, force=False):
             idx[region]['stop'] = track.tell()
             idx[region]['sum'] += data.value * data.span
             idx[region]['count'] += data.span
+
+    idx['_all'] = {
+        'region': '_all',
+        'start':  0,
+        'stop':   track.tell(),
+        'sum':    sum(r['sum'] for r in idx.values()),
+        'count':  sum(r['count'] for r in idx.values())}
 
     return idx, write_index(idx, track)
