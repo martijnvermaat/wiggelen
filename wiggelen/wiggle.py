@@ -7,6 +7,10 @@ Read and write wiggle tracks.
     ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
 .. todo: Note that positioning is one-based.
 .. todo: Note in manual that itertools.ifilter and itertools.imap are useful.
+.. todo: Now that we also include the end positions in the index, it is
+    possible to do random jumps inside a region with some educated guessing.
+    Perfect hits would not be possible, since the length of the lines is
+    variable.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>

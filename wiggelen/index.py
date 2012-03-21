@@ -15,9 +15,8 @@ is a regular file). Example of the serialization we use::
     region=Y,start=8743,stop=10362,sum=7353,count=343
     region=MT,start=10362,stop=12453,sum=353,count=143
 
-Note that we do not impose a certain order on the lines in the index or the
-fields on a line. Field values are tried to be parsed as int, float or string,
-in that order.
+Note that we do not impose a certain order on the lines in the index nor on
+the fields on a line.
 
 .. todo:: Add some other metrics to the index (standard deviation, min, max).
 
@@ -50,7 +49,8 @@ INDEX_SUFFIX = '.idx'
 
 
 def _cast(field, value):
-    casters = defaultdict(lambda: str, start=int, stop=int, sum=int, count=int)
+    casters = defaultdict(lambda: str,
+                          start=int, stop=int, sum=int, count=int)
     return casters[field](value)
 
 
@@ -63,14 +63,12 @@ def _index_filename(track=sys.stdin):
         return filename + INDEX_SUFFIX
 
 
-def write_index(summary, mapping, track=sys.stdout):
+def write_index(idx, track=sys.stdout):
     """
     Try to write the index to a file and return its filename.
 
-    :arg summary: Wiggle track summary data.
-    :type summary: dict(str, _)
-    :arg mapping: Mapping of regions to wiggle track positions.
-    :type mapping: dict(str, int)
+    :arg summary: Wiggle track index.
+    :type summary: dict(str, dict(str, _))
     :arg track: Wiggle track the index belongs to.
     :type track: file
 
@@ -88,8 +86,8 @@ def write_index(summary, mapping, track=sys.stdout):
 
     try:
         with open(filename, 'w') as f:
-            f.write('#' + ','.join('%s=%s' % d for d in summary.items()) + '\n')
-            f.write('\n'.join('%s %d' % i for i in mapping.items()) + '\n')
+            f.write('\n'.join(','.join('%s=%s' % d for d in r)
+                              for r in idx.values()) + '\n')
         return filename
     except IOError:
         pass
@@ -133,28 +131,22 @@ def index(track=sys.stdin, force=False):
     :arg force: Force creating an index if it does not yet exist.
     :type force: bool
 
-    :return: Wiggle track summary, mapping, and index filename.
-    :rtype: dict(str, _), dict(str, int), str
+    :return: Wiggle track index and index filename.
+    :rtype: dict(str, dict(str, _)), str
 
     .. todo:: Handle non-writable index, corrupt index, etc.
-    .. todo:: Also including the end positions would make it possible to do
-        random jumps inside a region with some educated guessing. Perfect hits
-        would not be possible, since the length of the lines are variable.
-    .. todo:: Just to calculate the summaries, we repeat ourselves quite a bit
-        here compared to the parsing in wiggle.walk, we could refactor this.
     """
     idx = read_index(track)
 
     if idx is not None:
-        summary, mapping = idx
-        return summary, mapping, None
+        # Todo: Shouldn't we return a filename here?
+        return idx, None
 
     if not force:
         return None
 
-    summary = {'sum': 0, 'count': 0}
-    mapping = {}
-
+    region = None
+    idx = {}
     state = create_state()
 
     while True:
@@ -164,9 +156,16 @@ def index(track=sys.stdin, force=False):
         line_type, data = parse(line, state)
 
         if line_type == LineType.REGION:
-            mapping[data] = track.tell() - len(line)
+            region = data
+            idx[region] = {
+                'region': region,
+                'start':  track.tell() - len(line),
+                'stop':   track.tell(),
+                'sum':    0,
+                'count':  0}
         elif line_type == LineType.DATA:
-            summary['count'] += data.span
-            summary['sum'] += data.value * data.span
+            idx[region]['stop'] = track.tell()
+            idx[region]['sum'] += data.value * data.span
+            idx[region]['count'] += data.span
 
-    return summary, mapping, write_index(summary, mapping, track)
+    return idx, write_index(idx, track)
