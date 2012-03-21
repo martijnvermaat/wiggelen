@@ -37,6 +37,7 @@ in that order.
 
 
 import sys
+from collections import defaultdict
 
 from .parse import LineType, create_state, parse
 
@@ -46,6 +47,11 @@ WRITE_INDEX = True
 
 #: Suffix used for index files.
 INDEX_SUFFIX = '.idx'
+
+
+def _cast(field, value):
+    casters = defaultdict(lambda: str, start=int, stop=int, sum=int, count=int)
+    return casters[field](value)
 
 
 def _index_filename(track=sys.stdin):
@@ -108,15 +114,12 @@ def read_index(track=sys.stdin):
 
     try:
         with open(filename) as f:
-#           idx = {}
-#            for line in f:
-#                data = dict((k, v) for k, v in
-#                           (d.split('=') for d in line[:-1].split(',')))
-
-            summary = dict((k, float(v)) for k, v in
-                           (d.split('=') for d in next(f)[1:-1].split(',')))
-            idx = dict((r, dict(d)) for r, d in (l.split() for l in f))
-        return summary, mapping
+            idx = {}
+            for line in f:
+                data = dict((k, _cast(k, v)) for k, v in
+                            (d.split('=') for d in line.rstrip().split(',')))
+                idx[data['region']] = data
+            return idx
     except IOError:
         pass
 
