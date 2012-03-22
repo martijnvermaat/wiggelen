@@ -2,7 +2,7 @@ API Reference
 =============
 
 .. automodule:: wiggelen
-   :members: ParseError, walk, zip_, fill, write
+   :members: ParseError, ReadError, walk, zip_, fill, write
 
 
 wiggelen.merge
@@ -24,3 +24,4 @@ wiggelen.index
 
 .. automodule:: wiggelen.index
    :members:
+   :exclude-members: ReadError

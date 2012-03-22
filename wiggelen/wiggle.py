@@ -23,7 +23,7 @@ Read and write wiggle tracks.
 import sys
 
 from .parse import LineType, create_state, parse
-from .index import index, write_index
+from .index import ReadError, index, write_index
 
 
 def walk(track=sys.stdin, force_index=False):

@@ -18,7 +18,7 @@ scores, read depth, and transcriptome data.
 
 
 from .parse import ParseError
-from .wiggle import walk, zip_, fill, write
+from .wiggle import ReadError, walk, zip_, fill, write
 
 
 # On the event of a new release, we update the __version_info__ package
