@@ -14,7 +14,7 @@ from collections import namedtuple
 
 class ParseError(Exception):
     """
-    Exception raised if a wiggle track cannot be parsed.
+    Raised if a wiggle track cannot be parsed.
     """
     pass
 

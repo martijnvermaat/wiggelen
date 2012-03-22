@@ -55,6 +55,14 @@ CACHE_INDEX = True
 _cache = {}
 
 
+class ReadError(Exception):
+    """
+    Raised if a wiggle track does not provide random access. Reading with
+    random access is needed for using and creating an index.
+    """
+    pass
+
+
 # Cast index values to their respective types.
 def _cast(field, value):
     casters = defaultdict(lambda: str,
@@ -165,6 +173,11 @@ def index(track=sys.stdin, force=False):
 
     if idx is not None or not force:
         return idx, _index_filename(track)
+
+    try:
+        track.tell()
+    except IOError:
+        raise ReadError('Could not index track (needs random access)')
 
     region = None
     idx = {}
