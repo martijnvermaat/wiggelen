@@ -50,7 +50,7 @@ INDEX_SUFFIX = '.idx'
 
 def _cast(field, value):
     casters = defaultdict(lambda: str,
-                          start=int, stop=int, sum=int, count=int)
+                          start=int, stop=int, sum=float, count=int)
     return casters[field](value)
 
 
@@ -67,8 +67,8 @@ def write_index(idx, track=sys.stdout):
     """
     Try to write the index to a file and return its filename.
 
-    :arg summary: Wiggle track index.
-    :type summary: dict(str, dict(str, _))
+    :arg idx: Wiggle track index.
+    :type idx: dict(str, dict(str, _))
     :arg track: Wiggle track the index belongs to.
     :type track: file
 
@@ -86,8 +86,8 @@ def write_index(idx, track=sys.stdout):
 
     try:
         with open(filename, 'w') as f:
-            f.write('\n'.join(','.join('%s=%s' % d for d in r)
-                              for r in idx.values()) + '\n')
+            f.write('\n'.join(','.join('%s=%s' % d for d in s.items())
+                              for s in idx.values()) + '\n')
         return filename
     except IOError:
         pass
@@ -114,9 +114,11 @@ def read_index(track=sys.stdin):
         with open(filename) as f:
             idx = {}
             for line in f:
-                data = dict((k, _cast(k, v)) for d in line.rstrip().split(',')
-                            for k, v in d.split('='))
-                idx[data['region']] = data
+                summary = {}
+                for d in line.rstrip().split(','):
+                    k, v = d.split('=')
+                    summary[k] = _cast(k, v)
+                idx[summary['region']] = summary
             return idx
     except IOError:
         pass
@@ -138,12 +140,9 @@ def index(track=sys.stdin, force=False):
     """
     idx = read_index(track)
 
-    if idx is not None:
+    if idx is not None or not force:
         # Todo: Shouldn't we return a filename here?
         return idx, None
-
-    if not force:
-        return None
 
     region = None
     idx = {}

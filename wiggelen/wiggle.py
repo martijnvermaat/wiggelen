@@ -58,7 +58,7 @@ def walk(track=sys.stdin, force_index=False):
     """
     region = None
 
-    idx = index(track, force=force_index)
+    idx, _ = index(track, force=force_index)
 
     if idx is None:
         regions = [None]
