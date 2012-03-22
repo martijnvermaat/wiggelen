@@ -19,7 +19,8 @@ Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
 
 .. todo:: Implement the noise filter from ``wiggledist``. This is tricky to
     implement in a nice way, since it should be applied during indexing but
-    depends on a variable threshold.
+    depends on a variable threshold. If we add custom metrics in the index I
+    think we could use that.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
