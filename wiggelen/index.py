@@ -47,20 +47,35 @@ WRITE_INDEX = True
 #: Suffix used for index files.
 INDEX_SUFFIX = '.idx'
 
+#: Whether or not indices are cached in memory during execution.
+CACHE_INDEX = True
 
+
+# Cache store of indices, indexed by index filename.
+_cache = {}
+
+
+# Cast index values to their respective types.
 def _cast(field, value):
     casters = defaultdict(lambda: str,
                           start=int, stop=int, sum=float, count=int)
     return casters[field](value)
 
 
+# Try to create a filename for the index file.
 def _index_filename(track=sys.stdin):
-    """
-    Try to create a filename for the index file.
-    """
     filename = getattr(track, 'name', None)
     if filename is not None and not filename.startswith('<'):
+        # Note that this does not play nice if we have changed our current
+        # working dir and the file was opened using a relative path.
         return filename + INDEX_SUFFIX
+
+
+def clear_cache():
+    """
+    Clear the in-memory cache of index objects.
+    """
+    _cache.clear()
 
 
 def write_index(idx, track=sys.stdout):
@@ -76,12 +91,15 @@ def write_index(idx, track=sys.stdout):
         not be written.
     :rtype: str
     """
-    if not WRITE_INDEX:
-        return
-
     filename = _index_filename(track)
 
     if filename is None:
+        return
+
+    if CACHE_INDEX:
+        _cache[filename] = idx
+
+    if not WRITE_INDEX:
         return
 
     try:
@@ -110,6 +128,9 @@ def read_index(track=sys.stdin):
     if filename is None:
         return
 
+    if CACHE_INDEX and filename in _cache:
+        return _cache[filename]
+
     try:
         with open(filename) as f:
             idx = {}
@@ -136,13 +157,14 @@ def index(track=sys.stdin, force=False):
     :return: Wiggle track index and index filename.
     :rtype: dict(str, dict(str, _)), str
 
+    .. todo:: It is not possible to force the index to be rewritten if it
+        already exists.
     .. todo:: Handle non-writable index, corrupt index, etc.
     """
     idx = read_index(track)
 
     if idx is not None or not force:
-        # Todo: Shouldn't we return a filename here?
-        return idx, None
+        return idx, _index_filename(track)
 
     region = None
     idx = {}

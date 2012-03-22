@@ -9,7 +9,7 @@ from itertools import chain
 from nose.tools import *
 
 import wiggelen
-from wiggelen.index import INDEX_SUFFIX
+from wiggelen.index import INDEX_SUFFIX, clear_cache
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
@@ -22,10 +22,12 @@ def open_(filename, mode='r'):
     return open(os.path.join(DATA_DIR, filename), mode)
 
 
-def remove_indices():
+def remove_indices(keep_cache=False):
     """
     Cleanup any index files for the test data.
     """
+    if not keep_cache:
+        clear_cache()
     for file in os.listdir(DATA_DIR):
         if file.endswith(INDEX_SUFFIX):
             os.unlink(os.path.join(DATA_DIR, file))
@@ -122,6 +124,32 @@ class TestWiggle(object):
         for expected, item in zip(b, walker):
             assert_equal(expected, item)
         assert_raises(StopIteration, next, walker)
+
+        walker = wiggelen.walk(open_('b.wig'))
+        for expected, item in zip(b, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
+    def test_cache_index(self):
+        """
+        Walk over a track after the index has been made but has been removed
+        from the filesystem.
+        """
+        values = [(2, 392.0),
+                  (3, 408.0),
+                  (4, 420.0),
+                  (5, 452.0),
+                  (7, 466.0),
+                  (8, 474.0),
+                  (9, 479.0)]
+        b = [(r, p, v) for r in ('1', '13', 'MT') for (p, v) in values]
+
+        walker = wiggelen.walk(open_('b.wig'), force_index=True)
+        for expected, item in zip(b, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
+        remove_indices(keep_cache=True)
 
         walker = wiggelen.walk(open_('b.wig'))
         for expected, item in zip(b, walker):

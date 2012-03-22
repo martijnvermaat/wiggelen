@@ -85,7 +85,8 @@ def main():
         parser.error(str(e))
 
     if args.subcommand == 'index':
-        summary, mapping, filename = index(args.track, force=True)
+        # Todo: This will not rebuild the index if it already exists.
+        idx, filename = index(args.track, force=True)
         if filename is None:
             parser.error('Could not write index file')
 

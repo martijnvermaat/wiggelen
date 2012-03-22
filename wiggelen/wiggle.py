@@ -85,8 +85,13 @@ def walk(track=sys.stdin, force_index=False):
                 for i in range(data.span):
                     yield region, data.position + i, data.value
 
-    # Todo: Automatically build the index (if we read the whole file) and
-    # write it to a file?
+        # Todo: If there is no index yet, but we read the whole file, write
+        #     the index we just built. But if we go this route, I think we
+        #     should somehow merge wiggle.walk with index.index since they
+        #     will be doing virtually the same thing.
+        #
+        #     if expected_region is None:
+        #        write_index(idx, track)
 
 
 def zip_(*walkers):
