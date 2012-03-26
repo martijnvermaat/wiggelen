@@ -1,17 +1,15 @@
 """
 Read and write wiggle tracks.
 
-.. todo: Note in the documentation that walker values can be of any type, but
+.. todo:: Note in the documentation that walker values can be of any type, but
     that valid wiggle tracks only have int or float values.
-.. todo: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
+.. todo:: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
     ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
-.. todo: Note that positioning is one-based.
-.. todo: Note in manual that itertools.ifilter and itertools.imap are useful.
-.. todo: Now that we also include the end positions in the index, it is
+.. todo:: Now that we also include the end positions in the index, it is
     possible to do random jumps inside a region with some educated guessing.
     Perfect hits would not be possible, since the length of the lines is
     variable.
-.. todo: Note in the documentation that walking and indexing consumes the
+.. todo:: Note in the documentation that walking and indexing consumes the
     input track.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
