@@ -11,6 +11,8 @@ Read and write wiggle tracks.
     possible to do random jumps inside a region with some educated guessing.
     Perfect hits would not be possible, since the length of the lines is
     variable.
+.. todo: Note in the documentation that walking and indexing consumes the
+    input track.
 
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>

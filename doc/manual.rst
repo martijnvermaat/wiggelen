@@ -26,3 +26,9 @@ Merging
 -------
 
 Todo.
+
+
+Command line interface
+----------------------
+
+Todo.

@@ -22,11 +22,6 @@ the fields on a line.
 
 .. todo:: Mechanism to include custom metrics in the index?
 
-.. todo:: Cache the index objects somehow during the process. Unfortunately,
-    we cannot attach it to the track file handler, as it does not accept
-    additional attributes. I guess we can do something based on the hash of
-    the file handler?
-
 .. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
 .. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
 .. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
