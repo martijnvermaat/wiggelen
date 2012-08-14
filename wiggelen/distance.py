@@ -84,6 +84,7 @@ def matrix(size, reflexive=False, symmetric=False):
     :type reflexive: bool
     :symmetric: Include coordinates (``x``, ``y``) above the diagonal (where
         ``x < y``).
+    :type symmetric: bool
 
     :return: All coordinates in the matrix as tuples.
     :rtype: list(int, int)
