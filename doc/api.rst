@@ -19,6 +19,13 @@ wiggelen.distance
    :members:
 
 
+wiggelen.transform
+-----------------
+
+.. automodule:: wiggelen.transform
+   :members:
+
+
 wiggelen.index
 --------------
 
