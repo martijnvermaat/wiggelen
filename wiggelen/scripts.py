@@ -17,6 +17,9 @@ from .wiggle import walk, write
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
+from .transform import (backward_divided_difference,
+                        forward_divided_difference,
+                        central_divided_difference)
 
 # Python 3 compatibility.
 try:
@@ -79,6 +82,24 @@ def main():
     dparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track')
 
+    vparser = subparsers.add_parser('derivative',
+        description='Create derivative of a wiggle track.',
+        help='create derivative of a wiggle track')
+    vparser.add_argument('track', metavar='TRACK',
+        type=argparse.FileType('r'), help='wiggle track')
+    vparser.add_argument('-m', '--method', dest='method', type=str,
+        choices=('forward', 'backward', 'central'), default='forward',
+        help='type of divided difference method to use (default: '
+            '%(default)s)')
+    vparser.add_argument('-s', '--step', dest='step', type=int,
+        default=None, help='restrict to positions that are this far apart '
+            '(default: no restriction)')
+    vparser.add_argument('-a', '--auto-step', dest='auto_step',
+        action='store_true',
+        help='automatically set STEP to a value based on the first two '
+            'positions in TRACK (only used if STEP is omitted, always set if '
+            'METHOD is central)')
+
     try:
         args = parser.parse_args()
     except IOError as e:
@@ -122,6 +143,18 @@ def main():
             for j in range(0, i):
                 sys.stdout.write(' %.3f' % distances[i, j])
             sys.stdout.write('   x\n')
+
+    if args.subcommand == 'derivative':
+        kwargs = {'step': args.step}
+        if args.method == 'central':
+            derivative = central_divided_difference
+        elif args.method == 'backward':
+            derivative = backward_divided_difference
+            kwargs['auto_step'] = args.auto_step
+        else:
+            derivative = forward_divided_difference
+            kwargs['auto_step'] = args.auto_step
+        write(derivative(walk(args.track), **kwargs))
 
 
 if __name__ == '__main__':
