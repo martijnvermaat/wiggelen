@@ -20,7 +20,7 @@ wiggelen.distance
 
 
 wiggelen.transform
------------------
+------------------
 
 .. automodule:: wiggelen.transform
    :members:
