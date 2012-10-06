@@ -12,9 +12,7 @@ Read and write wiggle tracks.
 .. todo:: Note in the documentation that walking and indexing consumes the
     input track.
 
-.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+.. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 
 .. Licensed under the MIT license, see the LICENSE file.
 """
