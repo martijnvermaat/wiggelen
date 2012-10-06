@@ -5,22 +5,12 @@ Working with wiggle tracks in Python.
 
 .. warning:: This is a work in progress, probably not yet ready for use!
 
-.. toctree::
-   :maxdepth: 2
-
-   manual
-   api
-
-
-Description
------------
-
 Wiggelen is a Python library for working with `wiggle tracks <https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html>`_
 (WIG files). It also provides a command line interface to some of its
 functionality.
 
-The main goal of Wiggelen is to provide `light-weight`_ and `unified`_ access
-to wiggle tracks.
+The main goal of Wiggelen is to provide light-weight and unified access to
+wiggle tracks.
 
 Example::
 
@@ -34,22 +24,15 @@ Example::
     chrM:309     519.0
 
 
-Light-weight
-------------
+Contents
+--------
 
-Working with simple data should be simple. Wiggelen tries not to over-engineer
-by using builtin datatypes such as tuples instead of custom objects. Sane
-defaults are used throughout and things like indices are handled in the
-background transparently.
+.. toctree::
+   :maxdepth: 2
 
-
-Unified
--------
-
-The central operation in Wiggelen is walking a track. Be it in fixedSteps or
-variableSteps format, using any window size and step interval, walking a track
-yields values one position at a time. Many operations accept walkers as input
-and/or return walkers as output.
+   copyright
+   manual
+   api
 
 
 Indices and tables
