@@ -3,7 +3,7 @@ Wiggelen
 
 Working with wiggle tracks in Python.
 
-**Note that this is a work in progress, probably not yet ready for use!**
+**Warning:** This is a work in progress, probably not yet ready for use!
 
 
 Description
@@ -28,29 +28,15 @@ Example::
     chrM:309     519.0
 
 
-Light-weight
-------------
+Documentation
+-------------
 
-Working with simple data should be simple. Wiggelen tries not to over-engineer
-by using builtin datatypes such as tuples instead of custom objects. Sane
-defaults are used throughout and things like indices are handled in the
-background transparently.
+The `latest documentation <http://wiggelen.readthedocs.org/>`_ with a manual
+and API reference is hosted at Read The Docs.
 
 
-Unified
--------
+Copyright
+---------
 
-The central operation in Wiggelen is walking a track. Be it in fixedSteps or
-variableSteps format, using any window size and step interval, walking a track
-yields values one position at a time. Many operations accept walkers as input
-and/or return walkers as output.
-
-
-Copyright and license
----------------------
-
-* Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-* Copyright (c) 2012 Martijn Vermaat <martijn@vermaat.name>
-* Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
-
-Licensed under the MIT license, see the LICENSE file.
+Wiggelen is licensed under the MIT License, see the LICENSE file for details.
+See the AUTHORS file for a list of authors.
