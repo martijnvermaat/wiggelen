@@ -11,9 +11,10 @@ values).
 
 Merger ``count``: Compute the number of defined values.
 
-.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+Merger ``minus``: Subtract the second value from the first (and use 0 for
+undefined values). Only defined on exactly two values.
+
+.. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 
 .. Licensed under the MIT license, see the LICENSE file.
 """
@@ -34,11 +35,15 @@ _merger_mean = lambda vs: _merger_sum(vs) / len(vs)
 # Compute the number of defined values.
 _merger_count = lambda vs: sum(1 for v in vs if v is not None)
 
+# Substract the second from the first (and use 0 for undefined values).
+_merger_minus = lambda vs: (vs[0] or 0) - (vs[1] or 0)
+
 
 #: Predefined mergers. See :mod:`wiggelen.merge` for their definition.
 mergers = {'sum':   _merger_sum,
            'mean':  _merger_mean,
-           'count': _merger_count}
+           'count': _merger_count,
+           'minus': _merger_minus}
 
 
 def merge(*walkers, **options):

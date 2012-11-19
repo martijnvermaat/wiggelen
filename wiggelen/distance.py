@@ -22,9 +22,8 @@ Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
     depends on a variable threshold. If we add custom metrics in the index I
     think we could use that.
 
-.. Copyright (c) 2012 Leiden University Medical Center <humgen@lumc.nl>
-.. Copyright (c) 2012 Martijn Vermaat <m.vermaat.hg@lumc.nl>
-.. Copyright (c) 2012 Jeroen Laros <j.f.j.laros@lumc.nl>
+.. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
+.. moduleauthor:: Jeroen Laros <j.f.j.laros@lumc.nl>
 
 .. Licensed under the MIT license, see the LICENSE file.
 """
