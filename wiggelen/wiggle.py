@@ -277,6 +277,7 @@ def write(walker, track=sys.stdout, serializer=str):
        6 616.0
 
     .. todo:: Options for variable or fixed step, window size, etc.
+    .. todo:: Specify track name.
     """
     size = 0
 
