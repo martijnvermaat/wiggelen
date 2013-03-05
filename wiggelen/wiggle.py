@@ -162,9 +162,9 @@ def zip_(*walkers):
                     items[i] = None
 
 
-def fill(walker, regions=None):
+def fill(walker, regions=None, filler=None):
     """
-    Fill in undefined positions with None values.
+    Fill in undefined positions with `filler` (or ``None``).
 
     :arg walker: Tuple of (region, position, value) per defined position.
     :type walker: generator(str, int, _)
@@ -173,9 +173,11 @@ def fill(walker, regions=None):
         including) in these regions. If ``None``, fill positions in all
         regions between their first and last defined positions.
     :type regions: dict(str, (int, int))
+    :arg filler: Value to use for filling undefined positions.
+    :type filler: _
 
     :return: Tuples of (region, position, value) per position where value is
-        ``None`` if it was not defined in the original walker.
+        `filler` if it was not defined in the original walker.
     :rtype: generator(str, int, _)
 
     Example::
@@ -210,7 +212,7 @@ def fill(walker, regions=None):
                 try:
                     start, stop = regions[previous_region]
                     for p in range(max(previous_position + 1, start), stop + 1):
-                        yield previous_region, p, None
+                        yield previous_region, p, filler
                 except KeyError:
                     pass
             previous_region = region
@@ -220,18 +222,18 @@ def fill(walker, regions=None):
             # No explicitely specified regions, fill everything.
             if previous_position is not None:
                 for p in range(previous_position + 1, position):
-                    yield region, p, None
+                    yield region, p, filler
         else:
             try:
                 # Specified where we must fill.
                 start, stop = regions[region]
                 if previous_position is None:
                     for p in range(start, min(position, stop + 1)):
-                        yield region, p, None
+                        yield region, p, filler
                 else:
                     for p in range(max(previous_position + 1, start),
                                     min(position, stop + 1)):
-                        yield region, p, None
+                        yield region, p, filler
             except KeyError:
                 # Region is not in explicitely specified regions, don't
                 # fill it.
@@ -245,7 +247,7 @@ def fill(walker, regions=None):
         try:
             start, stop = regions[previous_region]
             for p in range(max(previous_position + 1, start), stop + 1):
-                yield previous_region, p, None
+                yield previous_region, p, filler
         except KeyError:
             pass
 
