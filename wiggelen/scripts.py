@@ -10,7 +10,7 @@ Command line interface for working with wiggle tracks.
 import sys
 import argparse
 
-from .wiggle import walk, write
+from .wiggle import fill, walk, write
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
@@ -24,6 +24,12 @@ try:
     map_ = imap
 except ImportError:
     map_ = map
+
+# Matplotlib only if it is installed.
+try:
+    from matplotlib import pyplot
+except ImportError:
+    pyplot = None
 
 
 def main():
@@ -97,6 +103,13 @@ def main():
             'positions in TRACK (only used if STEP is omitted, always set if '
             'METHOD is central)')
 
+    if pyplot is not None:
+        pparser = subparsers.add_parser('visualise',
+            description='Visualise a wiggle track.',
+            help='visualise a wiggle track (requires matplotlib)')
+        pparser.add_argument('track', metavar='TRACK', type=argparse.FileType('r'),
+            help='wiggle track')
+
     try:
         args = parser.parse_args()
     except IOError as e:
@@ -152,6 +165,11 @@ def main():
             derivative = forward_divided_difference
             kwargs['auto_step'] = args.auto_step
         write(derivative(walk(args.track), **kwargs))
+
+    if args.subcommand == 'visualise':
+        # Todo: Only visualise one chromosome.
+        pyplot.plot([v for _, _, v in fill(walk(args.track), filler=0)])
+        pyplot.show()
 
 
 if __name__ == '__main__':
