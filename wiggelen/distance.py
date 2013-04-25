@@ -137,7 +137,7 @@ def distance(*tracks, **options):
     # We construct a list of comparisons for the merger, where each comparison
     # is a tuple of (left, right, weight_left, weight_right).
     comparisons = []
-    sums = [index(track, force=True)[0]['sum'] for track in tracks]
+    sums = [index(track, force=True)[0]['_all']['sum'] for track in tracks]
     for left, right in matrix(len(tracks)):
         weight_right, weight_left = normalize(sums[left], sums[right])
         comparisons.append( (left, right, weight_left, weight_right) )
