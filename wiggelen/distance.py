@@ -29,7 +29,7 @@ from __future__ import division
 from collections import defaultdict
 
 from .wiggle import walk
-from .index import index
+from .index import Field, index
 from .merge import merge
 
 
@@ -137,18 +137,16 @@ def distance(*tracks, **options):
     comparisons = []
 
     if threshold:
-        index_field = 'sum-threshold-%s' % str(threshold)
+        field_name = 'sum-threshold-%s' % str(threshold)
         noise_filter = lambda value: max(value - threshold, 0)
-        customs = [(index_field,
-                    float,
-                    0,
-                    lambda acc, value, span: acc + noise_filter(value) * span)]
+        func = lambda acc, value, span: acc + noise_filter(value) * span
+        fields = [Field(field_name, float, 0, func)]
     else:
-        index_field = 'sum'
+        field_name = 'sum'
         noise_filter = lambda value: value
-        customs = []
+        fields = []
 
-    sums = [index(track, force=True, customs=customs)[0]['_all'][index_field]
+    sums = [index(track, force=True, fields=fields)[0]['_all'][field_name]
             for track in tracks]
     for left, right in matrix(len(tracks)):
         weight_right, weight_left = normalize(sums[left], sums[right])

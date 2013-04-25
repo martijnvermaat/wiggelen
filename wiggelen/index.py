@@ -19,22 +19,30 @@ Note that we do not impose a certain order on the lines in the index nor on
 the fields on a line.
 
 Additional custom fields can be added to the index by providing custom field
-definitions. Such a definition is a 4-tuple with the following fields:
+definitions. Such a definition is created with the `Field` constructor and the
+following arguments:
 
 * The name of the field.
 * A function casting a field value from `string`.
 * Initial value.
-* Reducer function taking as inputs the accumulated field value, the current
-  value, and the current span, returning a new accumulated field value.
+* Aggregate function used as the function argument in a reduce- or fold-like
+  operation to construct the field value. This function takes as inputs the
+  accumulated field value, the current value and the current span, and returns
+  a new accumulated field value.
 
 As an example, the standard `sum` field could be defined as the
 following tuple::
 
-    'sum', float, 0, lambda acc, value, span: acc + value * span
+    Field('sum', float, 0, lambda acc, value, span: acc + value * span)
 
-In practice, choose unique names for custom fields.
+In practice, choose unique names for custom fields, not clashing with the
+standard fields such as `sum`.
 
 .. todo:: Add some other metrics to the index (standard deviation, min, max).
+
+.. todo:: A custom field that is missing from an existing index file causes
+   the entire index to be rebuilt, throwing away any other custom field values
+   that were already there.
 
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 
@@ -43,7 +51,7 @@ In practice, choose unique names for custom fields.
 
 
 import sys
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 
 from .parse import LineType, create_state, parse
 
@@ -62,6 +70,10 @@ CACHE_INDEX = True
 _cache = {}
 
 
+#: Type for custom index field definitions.
+Field = namedtuple('Field', 'name caster init func')
+
+
 class ReadError(Exception):
     """
     Raised if a wiggle track does not provide random access. Reading with
@@ -71,11 +83,11 @@ class ReadError(Exception):
 
 
 # Cast index values to their respective types.
-def _cast(field, value, customs=None):
-    customs = customs or []
+def _cast(field, value, fields=None):
+    fields = fields or []
     casters = defaultdict(lambda: str,
                           start=int, stop=int, sum=float, count=int)
-    casters.update(dict((field, caster) for field, caster, _, _ in customs))
+    casters.update(dict((field.name, field.caster) for field in fields))
     return casters[field](value)
 
 
@@ -128,21 +140,21 @@ def write_index(idx, track=sys.stdout):
         pass
 
 
-def read_index(track=sys.stdin, customs=None):
+def read_index(track=sys.stdin, fields=None):
     """
     Try to read the index from a file.
 
     :arg track: Wiggle track the index belongs to.
     :type track: file
-    :arg customs: List of custom index field definitions.
-    :type customs: list
+    :arg fields: List of custom index field definitions.
+    :type fields: list
 
     :return: Wiggle track index, or ``None`` if the index could not be read.
     :rtype: dict(str, dict(str, _))
 
     .. todo:: Only accept if index is newer than wiggle track?
     """
-    customs = customs or []
+    fields = fields or []
 
     filename = _index_filename(track)
 
@@ -159,18 +171,18 @@ def read_index(track=sys.stdin, customs=None):
                 summary = {}
                 for d in line.rstrip().split(','):
                     k, v = d.split('=')
-                    summary[k] = _cast(k, v, customs=customs)
+                    summary[k] = _cast(k, v, fields=fields)
                 idx[summary['region']] = summary
         # Todo: Here we check if all the required custom fields are in the
         #     index for `_all`, but we should really do a better check if all
         #     required data is there.
-        if all(field in idx['_all'] for field, _, _, _ in customs):
+        if all(field.name in idx['_all'] for field in fields):
             return idx
     except IOError:
         pass
 
 
-def index(track=sys.stdin, force=False, customs=None):
+def index(track=sys.stdin, force=False, fields=None):
     """
     Return index of region positions in track.
 
@@ -178,8 +190,8 @@ def index(track=sys.stdin, force=False, customs=None):
     :type track: file
     :arg force: Force creating an index if it does not yet exist.
     :type force: bool
-    :arg customs: List of custom index field definitions.
-    :type customs: list
+    :arg fields: List of custom index field definitions.
+    :type fields: list
 
     :return: Wiggle track index and index filename.
     :rtype: dict(str, dict(str, _)), str
@@ -188,9 +200,9 @@ def index(track=sys.stdin, force=False, customs=None):
         already exists.
     .. todo:: Handle non-writable index, corrupt index, etc.
     """
-    customs = customs or []
+    fields = fields or []
 
-    idx = read_index(track, customs=customs)
+    idx = read_index(track, fields=fields)
 
     if idx is not None or not force:
         return idx, _index_filename(track)
@@ -206,7 +218,7 @@ def index(track=sys.stdin, force=False, customs=None):
                     'stop':   track.tell(),
                     'sum':    0,
                     'count':  0}}
-    idx['_all'].update(dict((field, init) for field, _, init, _ in customs))
+    idx['_all'].update(dict((field.name, field.init) for field in fields))
 
     state = create_state()
 
@@ -224,16 +236,17 @@ def index(track=sys.stdin, force=False, customs=None):
                 'stop':   track.tell(),
                 'sum':    0,
                 'count':  0}
-            idx[region].update(dict((field, init)
-                                    for field, _, init, _ in customs))
+            idx[region].update(dict((field.name, field.init)
+                                    for field in fields))
         elif line_type == LineType.DATA:
             for r in region, '_all':
                 idx[r]['stop'] = track.tell()
                 idx[r]['sum'] += data.value * data.span
                 idx[r]['count'] += data.span
-                idx[r].update(dict((field, reducer(idx[r][field],
-                                                   data.value,
-                                                   data.span))
-                               for field, _, _, reducer in customs))
+                idx[r].update(dict((field.name,
+                                    field.func(idx[r][field.name],
+                                               data.value,
+                                               data.span))
+                               for field in fields))
 
     return idx, write_index(idx, track)
