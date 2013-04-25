@@ -112,10 +112,6 @@ def distance(*tracks, **options):
     """
     Calculate the pairwise distances between wiggle tracks.
 
-    .. note:: This function does not implement the noise filter from the
-        `wiggledist <https://humgenprojects.lumc.nl/trac/wiggledist/>`_
-        program. It takes all values into account.
-
     :arg tracks: List of wiggle tracks.
     :type walkers: list(file)
     :arg metric: Pairwise distance metric (default: a).
@@ -128,6 +124,7 @@ def distance(*tracks, **options):
     :rtype: dict((int, int), float)
 
     .. todo:: Check where this goes wrong if we cannot .seek() the tracks.
+    .. todo:: Calculate weights per region instead of over the entire track.
     """
     metric = options.get('metric', metrics['a'])
     threshold = options.get('threshold')
