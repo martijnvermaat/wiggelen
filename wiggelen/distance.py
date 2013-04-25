@@ -17,11 +17,6 @@ Metric ``c``: :math:`\\frac{\\text{max}(x, y) \, |x - y|}{(x^2 + 1) (y^2 + 1)}`
 
 Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
 
-.. todo:: Implement the noise filter from ``wiggledist``. This is tricky to
-    implement in a nice way, since it should be applied during indexing but
-    depends on a variable threshold. If we add custom metrics in the index I
-    think we could use that.
-
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 .. moduleauthor:: Jeroen Laros <j.f.j.laros@lumc.nl>
 
@@ -79,7 +74,7 @@ def matrix(size, reflexive=False, symmetric=False):
 
     :arg size: Width and height of the matrix.
     :type size: int
-    :reflexive: Include coordinates on (``x``, ``x``) diagonal.
+    :arg reflexive: Include coordinates on (``x``, ``x``) diagonal.
     :type reflexive: bool
     :symmetric: Include coordinates (``x``, ``y``) above the diagonal (where
         ``x < y``).
@@ -123,8 +118,10 @@ def distance(*tracks, **options):
 
     :arg tracks: List of wiggle tracks.
     :type walkers: list(file)
-    :keyword metric: Pairwise distance metric (default: a).
+    :arg metric: Pairwise distance metric (default: a).
     :type merger: function(float, float -> float)
+    :arg threshold: Threshold for noise filter (default: no noise filter)
+    :type threshold: float
 
     :return: Pairwise distances between ``tracks`` as a mapping from
         coordinates in the distance matrix to their values.
@@ -133,11 +130,26 @@ def distance(*tracks, **options):
     .. todo:: Check where this goes wrong if we cannot .seek() the tracks.
     """
     metric = options.get('metric', metrics['a'])
+    threshold = options.get('threshold')
 
     # We construct a list of comparisons for the merger, where each comparison
     # is a tuple of (left, right, weight_left, weight_right).
     comparisons = []
-    sums = [index(track, force=True)[0]['_all']['sum'] for track in tracks]
+
+    if threshold:
+        index_field = 'sum-threshold-%s' % str(threshold)
+        noise_filter = lambda value: max(value - threshold, 0)
+        customs = [(index_field,
+                    float,
+                    0,
+                    lambda acc, value, span: acc + noise_filter(value) * span)]
+    else:
+        index_field = 'sum'
+        noise_filter = lambda value: value
+        customs = []
+
+    sums = [index(track, force=True, customs=customs)[0]['_all'][index_field]
+            for track in tracks]
     for left, right in matrix(len(tracks)):
         weight_right, weight_left = normalize(sums[left], sums[right])
         comparisons.append( (left, right, weight_left, weight_right) )
@@ -150,8 +162,8 @@ def distance(*tracks, **options):
             if value_left is None and value_right is None:
                 result = None
             else:
-                x = weight_left * value_left if value_left else 0
-                y = weight_right * value_right if value_right else 0
+                x = weight_left * noise_filter(value_left) if value_left else 0
+                y = weight_right * noise_filter(value_right) if value_right else 0
                 result = metric(x, y)
             results[left, right] = result
         return results

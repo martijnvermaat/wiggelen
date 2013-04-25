@@ -82,6 +82,8 @@ def main():
         help='calculate the distances between wiggle tracks')
     dparser.add_argument('-m', dest='metric', choices=metrics, default='a',
         help='pairwise distance metric to use (default: %(default)s)')
+    dparser.add_argument('-t', dest='threshold', type=float, default=None,
+        help='threshold for noise filter (default: no noise filter)')
     dparser.add_argument('tracks', metavar='TRACK', nargs='+',
         type=argparse.FileType('r'), help='wiggle track')
 
@@ -135,7 +137,8 @@ def main():
 
     if args.subcommand == 'distance':
         # Todo: Cleanup this code.
-        distances = distance(*args.tracks, metric=metrics[args.metric])
+        distances = distance(*args.tracks, metric=metrics[args.metric],
+                              threshold=args.threshold)
         def name(index):
             return chr(ord('A') + index)
         try:
