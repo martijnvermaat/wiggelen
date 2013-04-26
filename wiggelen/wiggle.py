@@ -1,16 +1,12 @@
 """
 Read and write wiggle tracks.
 
-.. todo:: Note in the documentation that walker values can be of any type, but
-    that valid wiggle tracks only have int or float values.
 .. todo:: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
     ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
 .. todo:: Now that we also include the end positions in the index, it is
     possible to do random jumps inside a region with some educated guessing.
     Perfect hits would not be possible, since the length of the lines is
     variable.
-.. todo:: Note in the documentation that walking and indexing consumes the
-    input track.
 
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 
@@ -42,6 +38,7 @@ def walk(track=sys.stdin, force_index=False):
 
         >>> for x in walk():
         ...     x
+        ...
         ('chr18', 34344, 629.0)
         ('chr18', 34345, 649.0)
         ('chr18', 34446, 657.0)
@@ -49,11 +46,11 @@ def walk(track=sys.stdin, force_index=False):
         ('chrM',  309,   519.0)
 
     .. todo:: Optionally give a list of regions to walk, in that order.
-    .. todo:: Do something with browser and track lines.
-    .. todo:: Better exceptions.
-    .. todo:: Prettify this code.
-    .. todo:: Detect if index does not agree with track.
     """
+    # Todo: Do something with browser and track lines.
+    # Todo: Better exceptions.
+    # Todo: Prettify this code.
+    # Todo: Detect if index does not agree with track.
     region = None
 
     idx, _ = index(track, force=force_index)
@@ -95,12 +92,12 @@ def walk(track=sys.stdin, force_index=False):
 def zip_(*walkers):
     """
     Walk over all tracks simultaneously and for each position yield the
-    region, position and a list of values for each track, or ``None`` in case
+    region, position and a list of values for each track, or `None` in case
     the track has no value on the position.
 
     .. note:: This assumes the order of regions is compatible over all
         walkers. If you are unsure if this is the case for your input wiggle
-        tracks, use the :func:`walk` function with the ``force_index`` keyword
+        tracks, use the :func:`walk` function with the `force_index` keyword
         argument.
 
     :arg walkers: List of generators yielding tuples of (region, position,
@@ -114,6 +111,7 @@ def zip_(*walkers):
 
         >>> for x in zip_(walk(open('a.wig')), walk(open('b.wig'))):
         ...     x
+        ...
         ('18', 7, [29.0, None])
         ('18', 8, [49.0, None])
         ('18', 9, [None, 87.0])
@@ -164,13 +162,13 @@ def zip_(*walkers):
 
 def fill(walker, regions=None, filler=None):
     """
-    Fill in undefined positions with `filler` (or ``None``).
+    Fill in undefined positions with `filler` (or `None`).
 
     :arg walker: Tuple of (region, position, value) per defined position.
     :type walker: generator(str, int, _)
     :arg regions: Dictionary with regions as keys and (start, stop) tuples as
-        values. If not ``None``, fill positions from start to stop (both
-        including) in these regions. If ``None``, fill positions in all
+        values. If not `None`, fill positions from start to stop (both
+        including) in these regions. If `None`, fill positions in all
         regions between their first and last defined positions.
     :type regions: dict(str, (int, int))
     :arg filler: Value to use for filling undefined positions.
@@ -184,12 +182,14 @@ def fill(walker, regions=None, filler=None):
 
         >>> for x in walk(open('a.wig')):
         ...     x
+        ...
         ('MT', 3, 29.0)
         ('MT', 5, 49.0)
         ('MT', 8, 87.0)
         ('MT', 9, 20.0)
         >>> for x in fill(walk(open('a.wig')):
         ...     x
+        ...
         ('MT', 3, 29.0)
         ('MT', 4, None)
         ('MT', 5, 49.0)
@@ -307,8 +307,6 @@ def write(walker, track=sys.stdout, serializer=str):
         idx[region]['count'] += 1
         size += len(line)
 
-    # Todo: Technically, start of _all is not 0 since we always have a track
-    # line in the file.
     idx['_all'] = {
         'region': '_all',
         'start':  0,

@@ -58,6 +58,7 @@ def merge(*walkers, **options):
         ...            for track in ('a.wig', 'b.wig', 'c.wig')]
         >>> for x in merge(*walkers):
         ...     x
+        ...
         ('18', 8, 849.0)
         ('18', 9, 987.0)
         ('MT', 1, 820.0)
@@ -69,11 +70,10 @@ def merge(*walkers, **options):
     :type merger: function(list(_) -> _)
 
     :return: Tuples of (region, position, merged value) per defined position
-        in ``walkers``.
+        in `walkers`.
     :rtype: generator(str, int, _)
-
-    .. todo:: Would it be better to also pass region/position to the merger?
     """
+    # Todo: Would it be better to also pass region/position to the merger?
     merger = options.get('merger', mergers['sum'])
 
     for region, position, values in zip_(*walkers):

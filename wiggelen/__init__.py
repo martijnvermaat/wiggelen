@@ -1,13 +1,13 @@
 """
 Wiggelen, working with wiggle tracks in Python.
 
-The `wiggle (WIG) format <https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html>`_
-is for storing dense, continuous genomic data such as GC percent, probability
-scores, read depth, and transcriptome data.
+The `wiggle`_ (WIG) format is for storing dense, continuous genomic data such
+as GC percent, probability scores, read depth, and transcriptome data.
+
+.. _wiggle: https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html
 
 .. todo:: Specify region(s) to use (same as filter?), possibly with a BED file.
-.. todo:: Conversion to BigWig.
-.. todo:: Connect with numpy/pandas.
+.. todo:: Support for BigWig?
 
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 
@@ -34,10 +34,11 @@ from .wiggle import ReadError, walk, zip_, fill, write
 
 RELEASE = False
 
-__version_info__ = ('0', '1', 'dev')
+__version_info__ = ('0', '1', '0', 'dev')
+__date__ = '21 Sep 2012'
 
 
 __version__ = '.'.join(__version_info__)
 __author__ = 'LUMC, Martijn Vermaat, Jeroen Laros'
 __contact__ = 'm.vermaat.hg@lumc.nl'
-__homepage__ = 'http://www.humgen.nl'
+__homepage__ = 'https://github.com/martijnvermaat/wiggelen'

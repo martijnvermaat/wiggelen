@@ -1,5 +1,9 @@
-API Reference
+API reference
 =============
+
+
+wiggelen
+--------
 
 .. automodule:: wiggelen
    :members: ParseError, ReadError, walk, zip_, fill, write

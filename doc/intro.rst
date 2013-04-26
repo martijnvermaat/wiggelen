@@ -1,5 +1,5 @@
-Wiggelen
-========
+Introduction
+============
 
 Working with wiggle tracks in Python.
 
@@ -41,11 +41,31 @@ automatically on Python 2.6, 2.7, 3.2, 3.3, and PyPy using the Travis CI
 service.
 
 
+Changelog
+---------
+
+.. include:: ../CHANGES
+   :start-line: 2
+
+
 Copyright
 ---------
 
-Wiggelen is licensed under the MIT License, see the LICENSE file for details.
-See the AUTHORS file for a list of authors.
+Wiggelen is licensed under the MIT License, meaning you can do whatever you want
+with it as long as all copies include these license terms. The full license
+text can be found below.
+
+
+Authors
+^^^^^^^
+
+.. include:: ../AUTHORS
+
+
+License
+^^^^^^^
+
+.. include:: ../LICENSE
 
 
 .. _documentation: http://wiggelen.readthedocs.org/

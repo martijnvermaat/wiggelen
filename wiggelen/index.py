@@ -116,7 +116,7 @@ def write_index(idx, track=sys.stdout):
     :arg track: Wiggle track the index belongs to.
     :type track: file
 
-    :return: Filename for the written index, or ``None`` if the index could
+    :return: Filename for the written index, or `None` if the index could
         not be written.
     :rtype: str
     """
@@ -149,7 +149,7 @@ def read_index(track=sys.stdin, fields=None):
     :arg fields: List of custom index field definitions.
     :type fields: list
 
-    :return: Wiggle track index, or ``None`` if the index could not be read.
+    :return: Wiggle track index, or `None` if the index could not be read.
     :rtype: dict(str, dict(str, _))
 
     .. todo:: Only accept if index is newer than wiggle track?

@@ -69,15 +69,15 @@ def matrix(size, reflexive=False, symmetric=False):
     """
     Create all coordinates in a square matrix.
 
-    With the default ``False`` value for ``reflexive`` and ``symmetric``,
-    include only the coordinates below the diagonal.
+    With the default `False` value for `reflexive` and `symmetric`, include
+    only the coordinates below the diagonal.
 
     :arg size: Width and height of the matrix.
     :type size: int
-    :arg reflexive: Include coordinates on (``x``, ``x``) diagonal.
+    :arg reflexive: Include coordinates on (`x`, `x`) diagonal.
     :type reflexive: bool
-    :symmetric: Include coordinates (``x``, ``y``) above the diagonal (where
-        ``x < y``).
+    :arg symmetric: Include coordinates (`x`, `y`) above the diagonal (where
+        `x < y`).
     :type symmetric: bool
 
     :return: All coordinates in the matrix as tuples.
@@ -119,7 +119,7 @@ def distance(*tracks, **options):
     :arg threshold: Threshold for noise filter (default: no noise filter)
     :type threshold: float
 
-    :return: Pairwise distances between ``tracks`` as a mapping from
+    :return: Pairwise distances between `tracks` as a mapping from
         coordinates in the distance matrix to their values.
     :rtype: dict((int, int), float)
 

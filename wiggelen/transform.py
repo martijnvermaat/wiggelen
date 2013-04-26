@@ -52,14 +52,14 @@ def forward_divided_difference(walker, step=None, auto_step=False):
         defined position.
     :type walker: generator(str, int, float)
     :arg step: Restrict calculation to positions that are this far apart
-        (no restriction if ``None``).
+        (no restriction if `None`).
     :type step: int
-    :arg auto_step: If ``True`` and ``step=None``, automatically set ``step``
-        to a value based on the first two positions in ``walker``.
+    :arg auto_step: If `True` and `step=None`, automatically set `step` to a
+        value based on the first two positions in `walker`.
     :type auto_step: bool
 
     :return: Tuple of (region, position, derivative value) per defined
-        position in ``walker`` for which the derivative value is defined.
+        position in `walker` for which the derivative value is defined.
     :rtype: generator(str, int, float)
     """
     return _divided_difference(walker, direction=_FORWARD, step=step,
@@ -76,14 +76,14 @@ def backward_divided_difference(walker, step=None, auto_step=False):
         defined position.
     :type walker: generator(str, int, float)
     :arg step: Restrict calculation to positions that are this far apart
-        (no restriction if ``None``).
+        (no restriction if `None`).
     :type step: int
-    :arg auto_step: If ``True`` and ``step=None``, automatically set ``step``
-        to a value based on the first two positions in ``walker``.
+    :arg auto_step: If `True` and `step=None`, automatically set `step` to a
+        value based on the first two positions in `walker`.
     :type auto_step: bool
 
     :return: Tuple of (region, position, derivative value) per defined
-        position in ``walker`` for which the derivative value is defined.
+        position in `walker` for which the derivative value is defined.
     :rtype: generator(str, int, float)
     """
     return _divided_difference(walker, direction=_BACKWARD, step=step,
@@ -100,12 +100,12 @@ def central_divided_difference(walker, step=None):
         defined position.
     :type walker: generator(str, int, float)
     :arg step: Restrict calculation to positions that are this far apart. If
-        ``None``, automatically set ``step`` to a value based on the first two
-        positions in ``walker``.
+        `None`, automatically set `step` to a value based on the first two
+        positions in `walker`.
     :type step: int
 
     :return: Tuple of (region, position, derivative value) per defined
-        position in ``walker`` for which the derivative value is defined.
+        position in `walker` for which the derivative value is defined.
     :rtype: generator(str, int, float)
     """
     return _divided_difference(walker, direction=_CENTRAL, step=step,
