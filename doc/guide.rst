@@ -31,8 +31,8 @@ following contents, respectively::
     8 492.0
 
 
-Walking a track
----------------
+Walking over a track
+--------------------
 
 Walking a track is done with the :func:`wiggelen.walk` function, which yields
 tuples of `region`, `position`, `value`::
