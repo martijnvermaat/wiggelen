@@ -13,13 +13,16 @@ try:
 except ImportError:
     requires.append('argparse')
 
+with open('README.rst') as readme:
+    long_description = readme.read()
+
 import wiggelen as distmeta
 
 setup(
     name='wiggelen',
     version=distmeta.__version__,
     description='Working with wiggle tracks in Python',
-    long_description=distmeta.__doc__,
+    long_description=long_description,
     author=distmeta.__author__,
     author_email=distmeta.__contact__,
     url=distmeta.__homepage__,
