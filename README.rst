@@ -41,19 +41,6 @@ To install the latest release via PyPi using ``pip``::
     pip install wiggelen
 
 
-Latest release from source
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The source code for any release can be found on the GitHub `tags page
-<https://github.com/martijnvermaat/wiggelen/tags>`_. Let's say the latest one
-is ``0.1.0``, it can be downloaded and installed as follows::
-
-    wget https://github.com/martijnvermaat/wiggelen/archive/v0.1.0.tar.gz
-    tar xzf v0.1.0.tar.gz
-    cd wiggelen-0.1.0
-    python setup.py install
-
-
 Development version
 ^^^^^^^^^^^^^^^^^^^
 
@@ -62,7 +49,7 @@ GitHub repository::
 
     git clone https://github.com/martijnvermaat/wiggelen.git
     cd wiggelen
-    python setup.py develop
+    python setup.py install
 
 
 Documentation
