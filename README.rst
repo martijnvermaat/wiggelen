@@ -44,8 +44,8 @@ service.
 Copyright
 ---------
 
-Wiggelen is licensed under the MIT License, see the LICENSE file for details.
-See the AUTHORS file for a list of authors.
+Wiggelen is licensed under the MIT License, see the ``LICENSE`` file for
+details. See the ``AUTHORS`` file for a list of authors.
 
 
 .. _documentation: http://wiggelen.readthedocs.org/
