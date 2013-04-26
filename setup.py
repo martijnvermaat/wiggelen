@@ -28,7 +28,7 @@ setup(
     packages=['wiggelen'],
     requires=requires,
     entry_points = {
-        'console_scripts': ['wiggelen = wiggelen.scripts:main']
+        'console_scripts': ['wiggelen = wiggelen.commands:main']
         },
     classifiers = [
         'Development Status :: 3 - Alpha',
