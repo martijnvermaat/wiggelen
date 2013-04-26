@@ -32,9 +32,9 @@ from .wiggle import ReadError, walk, zip_, fill, write
 #
 # [1] http://peak.telecommunity.com/DevCenter/setuptools#specifying-your-project-s-version
 
-RELEASE = True
+RELEASE = False
 
-__version_info__ = ('0', '1', '0')
+__version_info__ = ('0', '1', '1', 'dev')
 __date__ = '26 Apr 2013'
 
 
