@@ -22,6 +22,49 @@ wiggle tracks.
     chrM:309     519.0
 
 
+Installation
+------------
+
+The Wiggelen `source code`_ is hosted on GitHub. Supported Python versions for
+running Wiggelen are 2.6, 2.7, 3.2, 3.3, and PyPy (`unit tests`_ are run
+automatically on these platforms using the Travis CI service).
+
+Wiggelen can be installed either via the Python Package Index (PyPi) or from
+the source code.
+
+
+Latest release via PyPi
+^^^^^^^^^^^^^^^^^^^^^^^
+
+To install the latest release via PyPi using ``pip``::
+
+    pip install wiggelen
+
+
+Latest release from source
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The source code for any release can be found on the GitHub `tags page
+<https://github.com/martijnvermaat/wiggelen/tags>`_. Let's say the latest one
+is ``0.1.0``, it can be downloaded and installed as follows::
+
+    wget https://github.com/martijnvermaat/wiggelen/archive/v0.1.0.tar.gz
+    tar xzf v0.1.0.tar.gz
+    cd wiggelen-0.1.0
+    python setup.py install
+
+
+Development version
+^^^^^^^^^^^^^^^^^^^
+
+You can also clone and use the latest development version directly from the
+GitHub repository::
+
+    git clone https://github.com/martijnvermaat/wiggelen.git
+    cd wiggelen
+    python setup.py develop
+
+
 Documentation
 -------------
 
@@ -31,14 +74,6 @@ hosted at Read The Docs.
 You can also compile the documentation directly from the source code by
 running ``make html`` from the ``doc/`` subdirectory. This requires `Sphinx`_
 to be installed.
-
-
-Source code
------------
-
-The Wiggelen `source code`_ is hosted on GitHub. All `unit tests`_ are run
-automatically on Python 2.6, 2.7, 3.2, 3.3, and PyPy using the Travis CI
-service.
 
 
 Changelog
