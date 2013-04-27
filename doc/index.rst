@@ -32,7 +32,7 @@ Contents
    guide
    commands
    api
-   contributing
+   development
    changelog
    copyright
 
