@@ -1,8 +1,6 @@
 """
 Read and write wiggle tracks.
 
-.. todo:: Integrate some of our existing scripts: ``ngs-misc/sageWiggle``,
-    ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``.
 .. todo:: Now that we also include the end positions in the index, it is
     possible to do random jumps inside a region with some educated guessing.
     Perfect hits would not be possible, since the length of the lines is

@@ -6,9 +6,6 @@ as GC percent, probability scores, read depth, and transcriptome data.
 
 .. _wiggle: https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html
 
-.. todo:: Specify region(s) to use (same as filter?), possibly with a BED file.
-.. todo:: Support for BigWig?
-
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 
 .. Licensed under the MIT license, see the LICENSE file.
