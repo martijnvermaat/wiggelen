@@ -32,6 +32,9 @@ Contents
    guide
    commands
    api
+   contributing
+   changelog
+   copyright
 
 
 Indices and tables

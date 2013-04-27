@@ -19,20 +19,17 @@ from .parse import ParseError
 from .wiggle import ReadError, walk, zip_, fill, write
 
 
-# On the event of a new release, we update the __version_info__ package
-# global and set RELEASE to True.
-# Before a release, a development version is denoted by a __version_info__
-# ending with a 'dev' item and RELEASE is set to False.
-#
 # We follow a versioning scheme compatible with setuptools [1] where the
-# __version_info__ variable always contains the version of the upcomming
-# release (and not that of the previous release), post-fixed with a 'dev'
-# item. Only in a release commit, this 'dev' item is removed (and added
-# again in the next commit).
+# package version is always that of the upcoming release (and not that of the
+# previous release), post-fixed with ``.dev``. Only in a release commit, the
+# ``.dev`` is removed (and added again in the next commit).
+#
+# Note that this scheme is not 100% compatible with SemVer [2] which would
+# require ``-dev`` instead of ``.dev``.
 #
 # [1] http://peak.telecommunity.com/DevCenter/setuptools#specifying-your-project-s-version
+# [2] http://semver.org/
 
-RELEASE = False
 
 __version_info__ = ('0', '1', '2', 'dev')
 __date__ = '27 Apr 2013'
