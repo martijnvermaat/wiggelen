@@ -30,13 +30,13 @@ The Wiggelen source code is `hosted on GitHub
 running Wiggelen are 2.6, 2.7, 3.2, 3.3, and PyPy (unit tests are run
 automatically on these platforms `using the Travis CI service
 <https://travis-ci.org/martijnvermaat/wiggelen>`_). Wiggelen can be installed
-either via the Python Package Index (PyPi) or from the source code.
+either via the Python Package Index (PyPI) or from the source code.
 
 
 Latest release via PyPi
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-To install the latest release via PyPi using ``pip``::
+To install the latest release via PyPI using pip::
 
     pip install wiggelen
 
