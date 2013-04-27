@@ -13,8 +13,11 @@ try:
 except ImportError:
     requires.append('argparse')
 
-with open('README.rst') as readme:
-    long_description = readme.read()
+try:
+    with open('README.rst') as readme:
+        long_description = readme.read()
+except IOError:
+    long_description = 'See https://pypi.python.org/pypi/wiggelen'
 
 import wiggelen as distmeta
 
