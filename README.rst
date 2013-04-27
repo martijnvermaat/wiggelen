@@ -27,7 +27,7 @@ To install the latest release via PyPI using pip::
 Documentation
 -------------
 
-The latest documentation including a user's guide and API reference is `hosted
+The latest documentation including a user guide and API reference is `hosted
 at Read The Docs <http://wiggelen.readthedocs.org/>`_.
 
 You can also compile the documentation directly from the source code by
