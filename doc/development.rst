@@ -51,6 +51,11 @@ Releasing a new version is done as follows:
 1. Make sure the section in the ``CHANGES`` file for this release is
    complete and there are no uncommitted changes.
 
+   .. note::
+
+    Commits since release X.Y.Z can be listed with ``git log vX.Y.Z..`` for
+    quick inspection.
+
 2. Update the ``CHANGES`` file to state the current date for this release
    and edit ``wiggelen/__init__.py`` by updating `__date__` and removing the
    ``dev`` value from `__version_info__`.
