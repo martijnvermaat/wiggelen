@@ -1,5 +1,5 @@
-User's guide
-============
+User guide
+==========
 
 Wiggelen is a light-weigh library and tries not to over-engineer. For example,
 builtin datatypes such as tuples are used instead of custom objects. Sane

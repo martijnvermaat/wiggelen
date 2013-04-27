@@ -1,8 +1,6 @@
 Wiggelen
 ========
 
-Working with wiggle tracks in Python.
-
 Wiggelen is a Python library for working with `wiggle`_ tracks (WIG files). It
 also provides a command line interface to some of its functionality.
 
@@ -22,16 +20,37 @@ wiggle tracks.
     chrM:309     519.0
 
 
-Contents
---------
+User documentation
+------------------
+
+New users should probably start here.
 
 .. toctree::
    :maxdepth: 2
 
-   intro
+   install
    guide
    commands
+
+
+API reference
+-------------
+
+Documentation on a specific function, class or method can be found in the API
+reference.
+
+.. toctree::
+   :maxdepth: 2
+
    api
+
+
+Additional notes
+----------------
+
+.. toctree::
+   :maxdepth: 2
+
    development
    changelog
    copyright
