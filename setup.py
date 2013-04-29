@@ -4,14 +4,13 @@ from setuptools import setup
 if sys.version_info < (2, 6):
     raise Exception('Wiggelen requires Python 2.6 or higher.')
 
-# Todo: How does this play with pip freeze requirement files?
-requires = ['nose']
+install_requires = []
 
 # Python 2.6 does not include the argparse module.
 try:
     import argparse
 except ImportError:
-    requires.append('argparse')
+    install_requires.append('argparse')
 
 try:
     with open('README.rst') as readme:
@@ -32,7 +31,7 @@ setup(
     license='MIT License',
     platforms=['any'],
     packages=['wiggelen'],
-    requires=requires,
+    install_requires=install_requires,
     entry_points = {
         'console_scripts': ['wiggelen = wiggelen.commands:main']
         },
