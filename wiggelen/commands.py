@@ -17,13 +17,16 @@ from .distance import metrics, distance
 from .transform import (backward_divided_difference,
                         forward_divided_difference,
                         central_divided_difference)
+from . import intervals
 
 # Python 3 compatibility.
 try:
-    from itertools import imap
+    from itertools import imap, ifilter
     map_ = imap
+    filter_ = ifilter
 except ImportError:
     map_ = map
+    filter_ = filter
 
 # Matplotlib only if it is installed.
 try:
@@ -92,6 +95,17 @@ def visualize_track(track):
     pyplot.show()
 
 
+def coverage_track(track, threshold=None):
+    """
+    Create coverage BED track of a wiggle track.
+    """
+    walker = walk(track)
+    if threshold is not None:
+        walker = filter_(lambda (r, p, v): v >= threshold, walker)
+
+    intervals.write(intervals.coverage(walker))
+
+
 def merge_tracks(tracks, merger='sum', no_indices=False):
     """
     Merge any number of wiggle tracks in various ways.
@@ -148,8 +162,8 @@ def main():
         description=sort_track.__doc__.split('\n\n')[0])
     p.set_defaults(func=sort_track)
     p.add_argument(
-        'track', metavar='TRACK', type=argparse.FileType('r')
-        , help='wiggle track')
+        'track', metavar='TRACK', type=argparse.FileType('r'),
+        help='wiggle track')
 
     p = subparsers.add_parser(
         'scale', help='scale values in a wiggle track',
@@ -179,8 +193,8 @@ def main():
     p.add_argument(
         '-a', '--auto-step', dest='auto_step', action='store_true',
         help='automatically set STEP to a value based on the first two '
-            'positions in TRACK (only used if STEP is omitted, always set if '
-            'METHOD is central)')
+        'positions in TRACK (only used if STEP is omitted, always set if '
+        'METHOD is central)')
 
     if pyplot is not None:
         p = subparsers.add_parser(
@@ -190,6 +204,18 @@ def main():
         p.add_argument(
             'track', metavar='TRACK', type=argparse.FileType('r'),
             help='wiggle track')
+
+    p = subparsers.add_parser(
+        'coverage', help='create coverage BED track of a wiggle track',
+        description=coverage_track.__doc__.split('\n\n')[0])
+    p.set_defaults(func=coverage_track)
+    p.add_argument(
+        'track', metavar='TRACK', type=argparse.FileType('r'),
+        help='wiggle track')
+    p.add_argument(
+        '-t', '--threshold', dest='threshold', type=int, default=None,
+        help='only include positions with this value or higher (default: no '
+        'threshold)')
 
     p = subparsers.add_parser(
         'merge', help='merge any number of wiggle tracks in various ways',

@@ -132,6 +132,20 @@ transformations for calculating the derivative of a walker::
    according to the specification can only contain `int` or `float` values.
 
 
+Coverage intervals
+------------------
+
+Genomic intervals of consecutively defined positions can be extracted from a
+walker using the :func:`wiggelen.intervals.coverage` function::
+
+    >>> for region, begin, end in intervals.coverage(walk(open('b.wig'))):
+    ...     print region, begin, end
+    ...
+    MT 1 2
+    MT 5 5
+    MT 8 8
+
+
 Merging walkers
 ---------------
 

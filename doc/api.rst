@@ -30,6 +30,13 @@ wiggelen.transform
    :members:
 
 
+wiggelen.intervals
+------------------
+
+.. automodule:: wiggelen.intervals
+   :members:
+
+
 wiggelen.index
 --------------
 
