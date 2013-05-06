@@ -88,8 +88,8 @@ Writing a walker to a track
 Any walker can be written to a track file using the :func:`wiggelen.write`
 function, which by default writes to standard output::
 
-    >>> write(walk(open('a.wig')))
-    track type=wiggle_0 name="" description=""
+    >>> write(walk(open('a.wig')), name='My example')
+    track type=wiggle_0 name="My example"
     variableStep chrom=MT
     1 520.0
     2 536.0

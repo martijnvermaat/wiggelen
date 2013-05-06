@@ -250,7 +250,8 @@ def fill(walker, regions=None, filler=None):
             pass
 
 
-def write(walker, track=sys.stdout, serializer=str):
+def write(walker, track=sys.stdout, serializer=str, name=None,
+          description=None):
     """
     Write items from a walker to a wiggle track.
 
@@ -260,11 +261,17 @@ def write(walker, track=sys.stdout, serializer=str):
     :type track: file
     :arg serializer: Function making strings from values.
     :type serializer: function(_ -> str)
+    :arg name: Optional track name (displayed to the left of the track in the
+        UCSC Genome Browser).
+    :type name: str
+    :arg description: Optional track description (displayed as center label in
+        the UCSC Genome Browser).
+    :type description: str
 
     Example::
 
-       >>> write(walk(open('a.wig')))
-       track type=wiggle_0 name="" description=""
+       >>> write(walk(open('a.wig')), name='My example')
+       track type=wiggle_0 name="My example"
        variableStep chrom=1
        1 520.0
        4 536.0
@@ -275,11 +282,15 @@ def write(walker, track=sys.stdout, serializer=str):
        6 616.0
 
     .. todo:: Options for variable or fixed step, window size, etc.
-    .. todo:: Specify track name.
     """
     size = 0
 
-    header = 'track type=wiggle_0 name="" description=""\n'
+    header = 'track type=wiggle_0'
+    if name is not None:
+        header += ' name="%s"' % name
+    if description is not None:
+        header += ' description="%s"' % description
+    header += '\n'
     track.write(header)
     size += len(header)
 
