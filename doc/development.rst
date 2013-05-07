@@ -89,9 +89,6 @@ Todo
 These are some general todo notes. More specific notes can be found by
 grepping the source code for ``Todo``.
 
-* Integrate some of our existing scripts (``ngs-misc/sageWiggle``,
-  ``gapss3/pileup2wig``, ``gapss3/mpileup2wig``, ``ngs-data/wiggle2region``,
-  Jeroen's pileup library, etc).
 * Option to specify region(s) to use from a track, in that order.
 * Beter unit tests coverage.
 

@@ -99,6 +99,8 @@ def coverage_track(track, threshold=None):
     """
     Create coverage BED track of a wiggle track.
     """
+    # Todo: Define coverage per region, like in `coverage-wiggle-to-bed` from
+    #     bio-playground (https://github.com/martijnvermaat/bio-playground).
     walker = walk(track)
     if threshold is not None:
         walker = filter_(lambda (r, p, v): v >= threshold, walker)
