@@ -33,7 +33,6 @@ def coverage(walker):
     interval = None
 
     for region, position, _ in walker:
-
         if interval is not None:
             if region != interval[0] or position != interval[2] + 1:
                 yield interval
