@@ -16,10 +16,3 @@ License
 -------
 
 .. include:: ../LICENSE
-
-
-.. _documentation: http://wiggelen.readthedocs.org/
-.. _source code: https://github.com/martijnvermaat/wiggelen
-.. _Sphinx: http://sphinx-doc.org/
-.. _unit tests: https://travis-ci.org/martijnvermaat/wiggelen
-.. _wiggle: https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html
