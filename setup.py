@@ -1,5 +1,6 @@
-import sys
+import os
 from setuptools import setup
+import sys
 
 if sys.version_info < (2, 6):
     raise Exception('Wiggelen requires Python 2.6 or higher.')
@@ -18,16 +19,30 @@ try:
 except IOError:
     long_description = 'See https://pypi.python.org/pypi/wiggelen'
 
-import wiggelen as distmeta
+# This is quite the hack, but we don't want to import our package from here
+# since that's recipe for disaster (it might have some uninstalled
+# dependencies, or we might import another already installed version).
+distmeta = {}
+for line in open(os.path.join('wiggelen', '__init__.py')):
+    try:
+        field, value = (x.strip() for x in line.split('='))
+    except ValueError:
+        continue
+    if field == '__version_info__':
+        value = value.strip('[]()')
+        value = '.'.join(x.strip(' \'"') for x in value.split(','))
+    else:
+        value = value.strip('\'"')
+    distmeta[field] = value
 
 setup(
     name='wiggelen',
-    version=distmeta.__version__,
+    version=distmeta['__version_info__'],
     description='Working with wiggle tracks in Python',
     long_description=long_description,
-    author=distmeta.__author__,
-    author_email=distmeta.__contact__,
-    url=distmeta.__homepage__,
+    author=distmeta['__author__'],
+    author_email=distmeta['__contact__'],
+    url=distmeta['__homepage__'],
     license='MIT License',
     platforms=['any'],
     packages=['wiggelen'],
