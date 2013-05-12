@@ -27,8 +27,8 @@ To install the latest release via PyPI using pip::
 Documentation
 -------------
 
-The latest documentation including a user guide and API reference is `hosted
-at Read The Docs <http://wiggelen.readthedocs.org/>`_.
+The `latest documentation <http://wiggelen.readthedocs.org/>`_ with user guide
+and API reference is hosted at Read The Docs.
 
 You can also compile the documentation directly from the source code by
 running ``make html`` from the ``doc/`` subdirectory. This requires `Sphinx`_
@@ -38,8 +38,8 @@ to be installed.
 Copyright
 ---------
 
-Wiggelen is licensed under the MIT License, see the ``LICENSE`` file for
-details. See the ``AUTHORS`` file for a list of authors.
+Wiggelen is licensed under the MIT License, see the LICENSE file for
+details. See the AUTHORS file for a list of authors.
 
 
 .. _Sphinx: http://sphinx-doc.org/
