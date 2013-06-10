@@ -91,6 +91,7 @@ grepping the source code for ``Todo``.
 
 * Option to specify region(s) to use from a track, in that order.
 * Beter unit tests coverage.
+* Profile code to identify what's keeping us from doing stuff fast.
 
 
 .. _nose: https://nose.readthedocs.org/
