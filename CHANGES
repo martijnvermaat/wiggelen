@@ -7,7 +7,7 @@ Here you can see the full list of changes between each Wiggelen release.
 Version 0.1.3
 -------------
 
-Release date to be decided.
+Released on June 11th 2013.
 
 - Fix distance calculation on values below threshold. Positions where both
   values are below the given threshold are ignored.
