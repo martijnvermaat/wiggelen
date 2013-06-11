@@ -9,6 +9,9 @@ Version 0.1.3
 
 Release date to be decided.
 
+- Fix distance calculation on values below threshold. Positions where both
+  values are below the given threshold are ignored.
+
 
 Version 0.1.2
 -------------
