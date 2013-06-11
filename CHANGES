@@ -9,6 +9,8 @@ Version 0.1.4
 
 Release date to be decided.
 
+- Fix distance module on Python 3.2+.
+
 
 Version 0.1.3
 -------------

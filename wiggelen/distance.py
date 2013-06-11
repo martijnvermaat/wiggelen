@@ -27,6 +27,7 @@ Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
 from __future__ import division
 
 from collections import defaultdict
+import itertools
 
 from .wiggle import walk
 from .index import Field, index
@@ -104,8 +105,8 @@ def matrix(size, reflexive=False, symmetric=False):
          (4, 0), (4, 1), (4, 2), (4, 3)        ]
     """
     return [(i, j) for i in range(0, size) for j in
-            range(i + 1 if reflexive else i) \
-            + range(i + 1, size if symmetric else 0)]
+            itertools.chain(range(i + 1 if reflexive else i),
+                            range(i + 1, size if symmetric else 0))]
 
 
 def distance(*tracks, **options):
