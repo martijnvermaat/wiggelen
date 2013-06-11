@@ -159,7 +159,7 @@ def distance(*tracks, **options):
             else:
                 x = weight_left * noise_filter(value_left) if value_left else 0
                 y = weight_right * noise_filter(value_right) if value_right else 0
-                result = metric(x, y)
+                result = metric(x, y) if x or y else None
             results[left, right] = result
         return results
 
