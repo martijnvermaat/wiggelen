@@ -209,7 +209,7 @@ def index(track=sys.stdin, force=False, fields=None):
 
     try:
         track.tell()
-    except IOError:
+    except (AttributeError, IOError):
         raise ReadError('Could not index track (needs random access)')
 
     region = None
