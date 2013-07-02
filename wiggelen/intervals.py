@@ -80,4 +80,4 @@ def write(intervals, track=sys.stdout, name=None, description=None):
     track.write(header)
 
     for interval in intervals:
-        track.write('%s %i %i\n' % interval)
+        track.write('%s\t%i\t%i\n' % interval)

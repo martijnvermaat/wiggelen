@@ -9,6 +9,7 @@ Version 0.1.4
 
 Release date to be decided.
 
+- Intervals BED track is now correctly written tab-delimited.
 - Fix distance module on Python 3.2+.
 
 
