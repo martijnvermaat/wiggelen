@@ -58,7 +58,7 @@ def parse(line, state):
         try:
             fields = dict(map(lambda field: field.split('='),
                               line[len('fixedStep'):].split()))
-            state['mode'] = Mode.VARIABLE
+            state['mode'] = Mode.FIXED
             state['start'] = int(fields['start'])
             state['step'] = int(fields['step'])
             state['span'] = int(fields.get('span', 1))
@@ -78,12 +78,12 @@ def parse(line, state):
 
     if state['mode'] == Mode.FIXED:
         try:
-            value = float(line) if '.' in line else int(line)
+            position = state['start']
             state['start'] += state['step']
             return LineType.DATA, Data(
-                position=start,
+                position=position,
                 span=state['span'],
-                value=value)
+                value=float(line) if '.' in line else int(line))
         except ValueError:
             raise ParseError('Could not parse line: %s' % line)
 

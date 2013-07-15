@@ -1,0 +1,5 @@
+track type=wiggle_0 name=test description=test visibility=full color=27,158,119 altColor=27,158,119 priority=100 autoscale=off gridDefault=on maxHeightPixels=128:128:11 graphType=bar yLineMark=0.0 yLineOnOff=off windowingFunction=maximum smoothingWindow=off
+fixedStep chrom=chr8 start=1 step=5 span=2
+11
+33
+44

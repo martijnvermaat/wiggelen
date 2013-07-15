@@ -61,6 +61,21 @@ class TestWiggle(object):
     def teardown(self):
         remove_indices()
 
+    def test_walk_fixed_step(self):
+        """
+        Walk over a fixed step wiggle track.
+        """
+        c = [('chr8', 1, 11),
+             ('chr8', 2, 11),
+             ('chr8', 6, 33),
+             ('chr8', 7, 33),
+             ('chr8', 11, 44),
+             ('chr8', 12, 44)]
+        walker = wiggelen.walk(open_('fixedstep.wig'))
+        for expected, item in zip(c, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
     def test_walk_single_region(self):
         """
         Walk over a track with a single region.
