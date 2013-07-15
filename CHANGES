@@ -4,10 +4,16 @@ Changelog
 Here you can see the full list of changes between each Wiggelen release.
 
 
-Version 0.1.4
+Version 0.1.5
 -------------
 
 Release date to be decided.
+
+
+Version 0.1.4
+-------------
+
+Released on July 15th 2013.
 
 - Fix parsing tracks in fixedStep mode.
 - Intervals BED track is now correctly written tab-delimited.
