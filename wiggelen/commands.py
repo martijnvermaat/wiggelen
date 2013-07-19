@@ -55,25 +55,35 @@ def index_track(track):
         abort('Could not write index file')
 
 
-def sort_track(track):
+def sort_track(track, name=None):
     """
     Sort wiggle track regions alphabetically.
     """
-    write(walk(track, force_index=True))
+    if name is None and hasattr(track, 'name'):
+        name = 'Sorted %s' % track.name
+
+    write(walk(track, force_index=True), name=name)
 
 
-def scale_track(track, factor=0.1):
+def scale_track(track, factor=0.1, name=None):
     """
     Scale values in a wiggle track.
     """
+    if name is None and hasattr(track, 'name'):
+        name = 'Scaled %s' % track.name
+
     scale = lambda (r, p, v): (r, p, v * factor)
-    write(map_(scale, walk(track)))
+    write(map_(scale, walk(track)), name=name)
 
 
-def derivative_track(track, method='forward', step=None, auto_step=False):
+def derivative_track(track, method='forward', step=None, auto_step=False,
+                     name=None):
     """
     Create derivative of a wiggle track.
     """
+    if name is None and hasattr(track, 'name'):
+        name = 'Derivative of %s' % track.name
+
     kwargs = {'step': step}
     if method == 'central':
         derivative = central_divided_difference
@@ -83,7 +93,7 @@ def derivative_track(track, method='forward', step=None, auto_step=False):
     else:
         derivative = forward_divided_difference
         kwargs['auto_step'] = auto_step
-    write(derivative(walk(track), **kwargs))
+    write(derivative(walk(track), **kwargs), name=name)
 
 
 def visualize_track(track):
@@ -95,26 +105,32 @@ def visualize_track(track):
     pyplot.show()
 
 
-def coverage_track(track, threshold=None):
+def coverage_track(track, threshold=None, name=None):
     """
     Create coverage BED track of a wiggle track.
     """
+    if name is None and hasattr(track, 'name'):
+        name = 'Coverage of %s' % track.name
+
     # Todo: Define coverage per region, like in `coverage-wiggle-to-bed` from
     #     bio-playground (https://github.com/martijnvermaat/bio-playground).
     walker = walk(track)
     if threshold is not None:
         walker = filter_(lambda (r, p, v): v >= threshold, walker)
 
-    intervals.write(intervals.coverage(walker))
+    intervals.write(intervals.coverage(walker), name=name)
 
 
-def merge_tracks(tracks, merger='sum', no_indices=False):
+def merge_tracks(tracks, merger='sum', no_indices=False, name=None):
     """
     Merge any number of wiggle tracks in various ways.
     """
+    if name is None and all(hasattr(track, 'name') for track in tracks):
+        name = 'Merge of %s' % ', '.join(track.name for track in tracks)
+
     walkers = [walk(track, force_index=not no_indices)
                for track in tracks]
-    write(merge(*walkers, merger=mergers[merger]))
+    write(merge(*walkers, merger=mergers[merger]), name=name)
 
 
 def distance_tracks(tracks, metric='a', threshold=None):
@@ -166,6 +182,9 @@ def main():
     p.add_argument(
         'track', metavar='TRACK', type=argparse.FileType('r'),
         help='wiggle track')
+    p.add_argument(
+        '-n', '--name', dest='name', type=str,
+        help='name to use for result track (default: Sorted TRACK)')
 
     p = subparsers.add_parser(
         'scale', help='scale values in a wiggle track',
@@ -177,6 +196,9 @@ def main():
     p.add_argument(
         '-f', '--factor', dest='factor', type=float, default=0.1,
         help='scaling factor to use (default: %(default)s)')
+    p.add_argument(
+        '-n', '--name', dest='name', type=str,
+        help='name to use for result track (default: Scaled TRACK)')
 
     p = subparsers.add_parser(
         'derivative', help='create derivative of a wiggle track',
@@ -197,6 +219,9 @@ def main():
         help='automatically set STEP to a value based on the first two '
         'positions in TRACK (only used if STEP is omitted, always set if '
         'METHOD is central)')
+    p.add_argument(
+        '-n', '--name', dest='name', type=str,
+        help='name to use for result track (default: Derivative of TRACK)')
 
     if pyplot is not None:
         p = subparsers.add_parser(
@@ -218,6 +243,9 @@ def main():
         '-t', '--threshold', dest='threshold', type=int, default=None,
         help='only include positions with this value or higher (default: no '
         'threshold)')
+    p.add_argument(
+        '-n', '--name', dest='name', type=str,
+        help='name to use for result track (default: Coverage of TRACK)')
 
     p = subparsers.add_parser(
         'merge', help='merge any number of wiggle tracks in various ways',
@@ -227,11 +255,14 @@ def main():
         '-m', dest='merger', choices=mergers, default='sum',
         help='merge operation to use (default: %(default)s)')
     p.add_argument(
-        '-n', '--no-indices', dest='no_indices', action='store_true',
+        '-x', '--no-indices', dest='no_indices', action='store_true',
         help='assume tracks are sorted, don\'t force building indices')
     p.add_argument(
         'tracks', metavar='TRACK', nargs='+', type=argparse.FileType('r'),
         help='wiggle track')
+    p.add_argument(
+        '-n', '--name', dest='name', type=str,
+        help='name to use for result track (default: Merge of TRACK, TRACK, ..)')
 
     # Todo: Add additional information on the metrics (using the epilog
     # argument of the subparser).
