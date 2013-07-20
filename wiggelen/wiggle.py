@@ -75,8 +75,12 @@ def walk(track=sys.stdin, force_index=False):
                 if expected_region is not None and region != expected_region:
                     break
             elif line_type == LineType.DATA:
-                for i in range(data.span):
+                # Optimization: A `while` loop is faster than `for` and
+                # `range`.
+                i = 0
+                while i < data.span:
                     yield region, data.position + i, data.value
+                    i += 1
 
         # Todo: If there is no index yet, but we read the whole file, write
         #     the index we just built. But if we go this route, I think we

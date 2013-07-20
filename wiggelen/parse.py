@@ -38,13 +38,38 @@ def create_state():
 def parse(line, state):
     # Parse a line and return a tuple (line_type, data). The state dictionary is
     # modified and should be passed as such with the next call.
-    if line.startswith('browser') or line.startswith('track') \
-           or line.startswith('#') or line.isspace():
+
+    # As an optimization, we first check for the common case of a line with
+    # data. It must always start with a number (either position or value).
+    if line[0] in '0123456789.':
+        if state['mode'] == Mode.VARIABLE:
+            try:
+                position, value = line.split()
+                return LineType.DATA, Data(
+                    position=int(position),
+                    span=state['span'],
+                    value=float(value) if '.' in value else int(value))
+            except ValueError:
+                raise ParseError('Could not parse line: %s' % line)
+
+        if state['mode'] == Mode.FIXED:
+            try:
+                position = state['start']
+                state['start'] += state['step']
+                return LineType.DATA, Data(
+                    position=position,
+                    span=state['span'],
+                    value=float(line) if '.' in line else int(line))
+            except ValueError:
+                raise ParseError('Could not parse line: %s' % line)
+
+    if line[:7] == 'browser' or line[:5] == 'track' \
+           or line[0] == '#' or line in ('\n', '\r\n', '\r'):
         # As far as I can see empty lines and comments are not allowed
         # by the spec, but I guess they exist in the real world.
         return LineType.NONE, None
 
-    if line.startswith('variableStep'):
+    if line[:12] == 'variableStep':
         try:
             fields = dict(map(lambda field: field.split('='),
                               line[len('variableStep'):].split()))
@@ -54,7 +79,7 @@ def parse(line, state):
         except (ValueError, KeyError):
             raise ParseError('Could not parse line: %s' % line)
 
-    if line.startswith('fixedStep'):
+    if line[:9] == 'fixedStep':
         try:
             fields = dict(map(lambda field: field.split('='),
                               line[len('fixedStep'):].split()))
@@ -64,27 +89,6 @@ def parse(line, state):
             state['span'] = int(fields.get('span', 1))
             return LineType.REGION, fields['chrom']
         except (ValueError, KeyError):
-            raise ParseError('Could not parse line: %s' % line)
-
-    if state['mode'] == Mode.VARIABLE:
-        try:
-            position, value = line.split()
-            return LineType.DATA, Data(
-                position=int(position),
-                span=state['span'],
-                value=float(value) if '.' in value else int(value))
-        except ValueError:
-            raise ParseError('Could not parse line: %s' % line)
-
-    if state['mode'] == Mode.FIXED:
-        try:
-            position = state['start']
-            state['start'] += state['step']
-            return LineType.DATA, Data(
-                position=position,
-                span=state['span'],
-                value=float(line) if '.' in line else int(line))
-        except ValueError:
             raise ParseError('Could not parse line: %s' % line)
 
     raise ParseError('Could not parse line: %s' % line)

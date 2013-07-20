@@ -12,6 +12,7 @@ Release date to be decided.
 - Optional track name for command line functions (`-n` or `--name`).
 - Command line argument `-n` or `--no-indices` for `merge` has been
   renamed to `-x` or `--no-indices`.
+- Slight performance improvement in parsing.
 
 
 Version 0.1.4

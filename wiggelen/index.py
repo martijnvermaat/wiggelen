@@ -243,10 +243,9 @@ def index(track=sys.stdin, force=False, fields=None):
                 idx[r]['stop'] = track.tell()
                 idx[r]['sum'] += data.value * data.span
                 idx[r]['count'] += data.span
-                idx[r].update(dict((field.name,
-                                    field.func(idx[r][field.name],
-                                               data.value,
-                                               data.span))
-                               for field in fields))
+                for field in fields:
+                    idx[r][field.name] = field.func(idx[r][field.name],
+                                                    data.value,
+                                                    data.span)
 
     return idx, write_index(idx, track)
