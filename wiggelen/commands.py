@@ -55,17 +55,17 @@ def index_track(track):
         abort('Could not write index file')
 
 
-def sort_track(track, name=None):
+def sort_track(track, name=None, description=None):
     """
     Sort wiggle track regions alphabetically.
     """
     if name is None and hasattr(track, 'name'):
         name = 'Sorted %s' % track.name
 
-    write(walk(track, force_index=True), name=name)
+    write(walk(track, force_index=True), name=name, description=description)
 
 
-def scale_track(track, factor=0.1, name=None):
+def scale_track(track, factor=0.1, name=None, description=None):
     """
     Scale values in a wiggle track.
     """
@@ -73,11 +73,11 @@ def scale_track(track, factor=0.1, name=None):
         name = 'Scaled %s' % track.name
 
     scale = lambda (r, p, v): (r, p, v * factor)
-    write(map_(scale, walk(track)), name=name)
+    write(map_(scale, walk(track)), name=name, description=description)
 
 
 def derivative_track(track, method='forward', step=None, auto_step=False,
-                     name=None):
+                     name=None, description=None):
     """
     Create derivative of a wiggle track.
     """
@@ -93,7 +93,8 @@ def derivative_track(track, method='forward', step=None, auto_step=False,
     else:
         derivative = forward_divided_difference
         kwargs['auto_step'] = auto_step
-    write(derivative(walk(track), **kwargs), name=name)
+    write(derivative(walk(track), **kwargs), name=name,
+          description=description)
 
 
 def visualize_track(track):
@@ -105,7 +106,7 @@ def visualize_track(track):
     pyplot.show()
 
 
-def coverage_track(track, threshold=None, name=None):
+def coverage_track(track, threshold=None, name=None, description=None):
     """
     Create coverage BED track of a wiggle track.
     """
@@ -118,10 +119,12 @@ def coverage_track(track, threshold=None, name=None):
     if threshold is not None:
         walker = filter_(lambda (r, p, v): v >= threshold, walker)
 
-    intervals.write(intervals.coverage(walker), name=name)
+    intervals.write(intervals.coverage(walker), name=name,
+                    description=description)
 
 
-def merge_tracks(tracks, merger='sum', no_indices=False, name=None):
+def merge_tracks(tracks, merger='sum', no_indices=False, name=None,
+                 description=None):
     """
     Merge any number of wiggle tracks in various ways.
     """
@@ -130,7 +133,8 @@ def merge_tracks(tracks, merger='sum', no_indices=False, name=None):
 
     walkers = [walk(track, force_index=not no_indices)
                for track in tracks]
-    write(merge(*walkers, merger=mergers[merger]), name=name)
+    write(merge(*walkers, merger=mergers[merger]), name=name,
+          description=description)
 
 
 def distance_tracks(tracks, metric='a', threshold=None):
@@ -184,7 +188,12 @@ def main():
         help='wiggle track')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
-        help='name to use for result track (default: Sorted TRACK)')
+        help='name to use for result track, displayed to the left of the '
+        'track in the UCSC Genome Browser (default: Sorted TRACK)')
+    p.add_argument(
+        '-d', '--description', dest='description', type=str,
+        help='description to use for result track, displayed as center label '
+        'in the UCSC Genome Browser (default: no description)')
 
     p = subparsers.add_parser(
         'scale', help='scale values in a wiggle track',
@@ -198,7 +207,12 @@ def main():
         help='scaling factor to use (default: %(default)s)')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
-        help='name to use for result track (default: Scaled TRACK)')
+        help='name to use for result track, displayed to the left of the '
+        'track in the UCSC Genome Browser (default: Sorted TRACK)')
+    p.add_argument(
+        '-d', '--description', dest='description', type=str,
+        help='description to use for result track, displayed as center label '
+        'in the UCSC Genome Browser (default: no description)')
 
     p = subparsers.add_parser(
         'derivative', help='create derivative of a wiggle track',
@@ -221,7 +235,12 @@ def main():
         'METHOD is central)')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
-        help='name to use for result track (default: Derivative of TRACK)')
+        help='name to use for result track, displayed to the left of the '
+        'track in the UCSC Genome Browser (default: Sorted TRACK)')
+    p.add_argument(
+        '-d', '--description', dest='description', type=str,
+        help='description to use for result track, displayed as center label '
+        'in the UCSC Genome Browser (default: no description)')
 
     if pyplot is not None:
         p = subparsers.add_parser(
@@ -245,7 +264,12 @@ def main():
         'threshold)')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
-        help='name to use for result track (default: Coverage of TRACK)')
+        help='name to use for result track, displayed to the left of the '
+        'track in the UCSC Genome Browser (default: Sorted TRACK)')
+    p.add_argument(
+        '-d', '--description', dest='description', type=str,
+        help='description to use for result track, displayed as center label '
+        'in the UCSC Genome Browser (default: no description)')
 
     p = subparsers.add_parser(
         'merge', help='merge any number of wiggle tracks in various ways',
@@ -262,7 +286,12 @@ def main():
         help='wiggle track')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
-        help='name to use for result track (default: Merge of TRACK, TRACK, ..)')
+        help='name to use for result track, displayed to the left of the '
+        'track in the UCSC Genome Browser (default: Sorted TRACK)')
+    p.add_argument(
+        '-d', '--description', dest='description', type=str,
+        help='description to use for result track, displayed as center label '
+        'in the UCSC Genome Browser (default: no description)')
 
     # Todo: Add additional information on the metrics (using the epilog
     # argument of the subparser).
