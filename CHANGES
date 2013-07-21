@@ -7,7 +7,7 @@ Here you can see the full list of changes between each Wiggelen release.
 Version 0.1.5
 -------------
 
-Release date to be decided.
+Released on July 21st 2013.
 
 - Optional track name (`-n` or `--name`) and description (`-d` or
   `--description`) for command line functions.
