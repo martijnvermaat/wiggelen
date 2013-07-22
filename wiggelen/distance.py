@@ -17,6 +17,8 @@ Metric ``c``: :math:`\\frac{\\text{max}(x, y) \, |x - y|}{(x^2 + 1) (y^2 + 1)}`
 
 Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
 
+.. note:: These metrics are ill-defined on the interval (0, 1).
+
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 .. moduleauthor:: Jeroen Laros <j.f.j.laros@lumc.nl>
 
