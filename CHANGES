@@ -7,7 +7,7 @@ Here you can see the full list of changes between each Wiggelen release.
 Version 0.1.6
 -------------
 
-Release date to be decided.
+Released on August 8th 2013.
 
 - Support `fixedStep` definitions without `step` argument. This is not valid
   by the spec, so a practical consideration. Fixes
