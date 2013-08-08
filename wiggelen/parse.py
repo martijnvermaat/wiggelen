@@ -85,8 +85,12 @@ def parse(line, state):
                               line[len('fixedStep'):].split()))
             state['mode'] = Mode.FIXED
             state['start'] = int(fields['start'])
-            state['step'] = int(fields['step'])
             state['span'] = int(fields.get('span', 1))
+            # Though not valid by the specification, we accept fixedStep
+            # definitions without a step argument (it's also accepted by the
+            # UCSC Genome Browser).
+            # Issue: https://github.com/martijnvermaat/wiggelen/issues/1
+            state['step'] = int(fields.get('step', min(1, state['span'])))
             return LineType.REGION, fields['chrom']
         except (ValueError, KeyError):
             raise ParseError('Could not parse line: %s' % line)

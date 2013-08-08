@@ -9,6 +9,10 @@ Version 0.1.6
 
 Release date to be decided.
 
+- Support `fixedStep` definitions without `step` argument. This is not valid
+  by the spec, so a practical consideration. Fixes
+  `issue #1 <https://github.com/martijnvermaat/wiggelen/issues/1>`_.
+
 
 Version 0.1.5
 -------------

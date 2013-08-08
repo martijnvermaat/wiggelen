@@ -1,0 +1,20 @@
+track autoScale="on" description="basecount" converted_by="track.serialize" color="0,200,100" visibility="full" type="wig" name="Hns_B"
+fixedStep chrom=chr start=1 span=2
+64.0
+fixedStep chrom=chr start=3 span=1
+65.0
+fixedStep chrom=chr start=4 span=3
+66.0
+fixedStep chrom=chr start=7 span=1
+69.0
+70.0
+fixedStep chrom=chr start=9 span=10
+71.0
+fixedStep chrom=chr start=19 span=7
+73.0
+fixedStep chrom=chr start=26 span=1
+74.0
+fixedStep chrom=chr start=27 span=4
+75.0
+fixedStep chrom=chr start=31 span=1
+76.0

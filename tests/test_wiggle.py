@@ -76,6 +76,54 @@ class TestWiggle(object):
             assert_equal(expected, item)
         assert_raises(StopIteration, next, walker)
 
+    def test_walk_fixed_step_without_step(self):
+        """
+        Walk over a fixed step wiggle track without `step` arguments.
+
+        According to the spec, `fixedStep` definitions require the `step`
+        argument. However, there seems to be real-world data where it is
+        missing and the UCSC Genome Browser can still work with it.
+
+        So we also support it.
+
+        Issue: https://github.com/martijnvermaat/wiggelen/issues/1
+        """
+        c = [('chr', 1, 64.),
+             ('chr', 2, 64.),
+             ('chr', 3, 65.),
+             ('chr', 4, 66.),
+             ('chr', 5, 66.),
+             ('chr', 6, 66.),
+             ('chr', 7, 69.),
+             ('chr', 8, 70.),
+             ('chr', 9, 71.),
+             ('chr', 10, 71.),
+             ('chr', 11, 71.),
+             ('chr', 12, 71.),
+             ('chr', 13, 71.),
+             ('chr', 14, 71.),
+             ('chr', 15, 71.),
+             ('chr', 16, 71.),
+             ('chr', 17, 71.),
+             ('chr', 18, 71.),
+             ('chr', 19, 73.),
+             ('chr', 20, 73.),
+             ('chr', 21, 73.),
+             ('chr', 22, 73.),
+             ('chr', 23, 73.),
+             ('chr', 24, 73.),
+             ('chr', 25, 73.),
+             ('chr', 26, 74.),
+             ('chr', 27, 75.),
+             ('chr', 28, 75.),
+             ('chr', 29, 75.),
+             ('chr', 30, 75.),
+             ('chr', 31, 76.)]
+        walker = wiggelen.walk(open_('fixedstep-without-step.wig'))
+        for expected, item in zip(c, walker):
+            assert_equal(expected, item)
+        assert_raises(StopIteration, next, walker)
+
     def test_walk_single_region(self):
         """
         Walk over a track with a single region.
