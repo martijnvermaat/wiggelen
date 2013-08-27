@@ -37,6 +37,12 @@ wiggelen.intervals
    :members:
 
 
+wiggelen.plot
+-------------
+.. automodule:: wiggelen.plot
+   :members:
+
+
 wiggelen.index
 --------------
 

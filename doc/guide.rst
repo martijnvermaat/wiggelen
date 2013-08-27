@@ -178,11 +178,31 @@ generation datasets.
 
 ::
 
-    >>> distance(open('a.wig'), open('b.wig'))
+    >>> distance.distance(open('a.wig'), open('b.wig'))
     {(1, 0): 0.5704115928792818}
 
 Four pairwise multiset distance metrics are pre-defined in
 :data:`wiggelen.distance.metrics`.
 
 
+Plotting tracks
+---------------
+
+Some rudimentary functionality for plotting a wiggle track is provided by the
+:mod:`wiggelen.plot` module. It requires the `matplotlib`_ package to be
+installed.
+
+.. note:: The :func:`wiggelen.plot.plot` function should not be used on very
+    large tracks.
+
+For example, to quickly visualize the ``tests/data/complex.wig`` file in the
+Wiggelen source repository::
+
+    >>> fig, _, _, _ = plot.plot(walk(open('tests/data/complex.wig')))
+    >>> fig.show()
+
+.. image:: plot.png
+
+
 .. _wiggle: https://cgwb.nci.nih.gov/goldenPath/help/wiggle.html
+.. _matplotlib: http://matplotlib.org/

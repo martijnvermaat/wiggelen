@@ -7,8 +7,10 @@ Wiggelen command line interface.
 """
 
 
-import sys
+from __future__ import division
+
 import argparse
+import sys
 
 from .wiggle import fill, walk, write
 from .index import index, write_index
@@ -28,11 +30,12 @@ except ImportError:
     map_ = map
     filter_ = filter
 
-# Matplotlib only if it is installed.
+# Plotting only if Matplotlib is installed.
 try:
     from matplotlib import pyplot
+    from .plot import plot
 except ImportError:
-    pyplot = None
+    matplotlib = plot = None
 
 
 def log(message):
@@ -97,13 +100,35 @@ def derivative_track(track, method='forward', step=None, auto_step=False,
           description=description)
 
 
-def visualize_track(track):
+def plot_track(tracks, region=None, columns=None, pdf=None):
     """
-    Visualize a wiggle track.
+    Visualize a wiggle track in a plot.
     """
-    # Todo: Only visualize one chromosome.
-    pyplot.plot([v for _, _, v in fill(walk(track), filler=0)])
-    pyplot.show()
+    # Only use specified region.
+    def filtered(walker):
+        if not region:
+            return walker
+        return filter_(lambda (r, p, v): r == region, walker)
+
+    # Prepend track name if we have more than one track.
+    def rename(region, track, i):
+        if len(tracks) > 1:
+            name = track.name if hasattr(track, 'name') else 'track %i' % i
+            return name + ', ' + region
+        return region
+
+    # Have all tracks concatenated in one walker.
+    walker = ((rename(r, track, i), p, v)
+              for i, track in enumerate(tracks)
+              for r, p, v in filtered(walk(track)))
+
+    fig, axes, rows, columns = plot(walker, columns=columns)
+
+    if pdf:
+        fig.set_size_inches(6 * columns, 3 * rows)
+        fig.savefig(pdf, format='pdf')
+    else:
+        pyplot.show()
 
 
 def coverage_track(track, threshold=None, name=None, description=None):
@@ -242,14 +267,23 @@ def main():
         help='description to use for result track, displayed as center label '
         'in the UCSC Genome Browser (default: no description)')
 
-    if pyplot is not None:
+    if plot is not None:
         p = subparsers.add_parser(
-            'visualize', help='visualize a wiggle track (requires matplotlib)',
-            description=visualize_track.__doc__.split('\n\n')[0])
-        p.set_defaults(func=visualize_track)
+            'plot', description=plot_track.__doc__.split('\n\n')[0],
+            help='visualize wiggle tracks in a plot (requires matplotlib)')
+        p.set_defaults(func=plot_track)
         p.add_argument(
-            'track', metavar='TRACK', type=argparse.FileType('r'),
+            'tracks', metavar='TRACK', type=argparse.FileType('r'), nargs='+',
             help='wiggle track')
+        p.add_argument(
+            '-r', '--region', dest='region', type=str, default=None,
+            help='plot only this region (default: plot all regions with data)')
+        p.add_argument(
+            '-c', '--columns', dest='columns', type=int, default=None,
+            help='when plotting multiple tracks and/or regions, use this many columns (default: automatically chosen)')
+        p.add_argument(
+            '-o', '--output', dest='pdf', type=argparse.FileType('wb'),
+            default=None, help='output PDF file')
 
     p = subparsers.add_parser(
         'coverage', help='create coverage BED track of a wiggle track',
