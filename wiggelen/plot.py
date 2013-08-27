@@ -38,6 +38,7 @@ def plot(walker, columns=None):
     axes = []
 
     for region, w in itertools.groupby(walker, lambda (r, p, v): r):
+        # Todo: Use wiggelen.fill to have None on undefined positions.
         positions, values = zip(*[(p, v) for r, p, v in w])
 
         # Temporarily add the subplot at location 111, we'll change that
