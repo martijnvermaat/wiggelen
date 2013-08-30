@@ -15,7 +15,7 @@ except ImportError:
 
 # Python 2.6 does not include OrderedDict.
 try:
-    from collections import OrderedDict.
+    from collections import OrderedDict
 except ImportError:
     install_requires.append('ordereddict')
 
