@@ -12,7 +12,7 @@ from __future__ import division
 import argparse
 import sys
 
-from .wiggle import fill, walk, write
+from .wiggle import walk, write
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
@@ -46,6 +46,19 @@ def abort(message=None):
     if message:
         log('error: ' + message)
     sys.exit(1)
+
+
+def read_regions(regions):
+    """
+    Ad-hoc parsing of regions from a BED track.
+    """
+    result = {}
+    for line in regions:
+        if line.startswith('track'):
+            continue
+        region, start, stop = line.strip().split('\t')[:3]
+        result[region] = int(start), int(stop)
+    return result
 
 
 def index_track(track):
@@ -100,29 +113,42 @@ def derivative_track(track, method='forward', step=None, auto_step=False,
           description=description)
 
 
-def plot_track(tracks, region=None, columns=None, pdf=None):
+def plot_tracks(tracks, regions=None, genome=None, order_by='region',
+                average_threshold=None, columns=None, pdf=None):
     """
-    Visualize a wiggle track in a plot.
+    Visualize wiggle tracks in a plot.
     """
-    # Only use specified region.
-    def filtered(walker):
-        if not region:
-            return walker
-        return filter_(lambda (r, p, v): r == region, walker)
+    def track_name(track, i):
+        return track.name if hasattr(track, 'name') else 'track %i' % i
 
     # Prepend track name if we have more than one track.
     def rename(region, track, i):
         if len(tracks) > 1:
-            name = track.name if hasattr(track, 'name') else 'track %i' % i
-            return name + ', ' + region
+            return track_name(track, i) + ', ' + region
         return region
+
+    if genome is not None:
+        # Read genome from BED track and filter by specified regions. If we
+        # have more than one track, have a region copy per track.
+        genome = {rename(r, track, i): v
+                  for r, v in read_regions(genome).items()
+                  for i, track in enumerate(tracks)
+                  if regions is None or r in regions}
+
+    # Filter by specified regions.
+    def filtered(walker):
+        if regions is None:
+            return walker
+        return filter_(lambda (r, p, v): r in regions, walker)
 
     # Have all tracks concatenated in one walker.
     walker = ((rename(r, track, i), p, v)
               for i, track in enumerate(tracks)
               for r, p, v in filtered(walk(track)))
 
-    fig, axes, rows, columns = plot(walker, columns=columns)
+    fig, axes, rows, columns = plot(
+        walker, regions=genome, order_by=order_by,
+        average_threshold=average_threshold, columns=columns)
 
     if pdf:
         fig.set_size_inches(6 * columns, 3 * rows)
@@ -269,15 +295,27 @@ def main():
 
     if plot is not None:
         p = subparsers.add_parser(
-            'plot', description=plot_track.__doc__.split('\n\n')[0],
+            'plot', description=plot_tracks.__doc__.split('\n\n')[0],
             help='visualize wiggle tracks in a plot (requires matplotlib)')
-        p.set_defaults(func=plot_track)
+        p.set_defaults(func=plot_tracks)
         p.add_argument(
             'tracks', metavar='TRACK', type=argparse.FileType('r'), nargs='+',
             help='wiggle track')
         p.add_argument(
-            '-r', '--region', dest='region', type=str, default=None,
-            help='plot only this region (default: plot all regions with data)')
+            '-r', '--regions', dest='regions', type=str, default=None, nargs='+',
+            help='plot only these regions (default: plot all regions with data)')
+        p.add_argument(
+            '-g', '--genome', dest='genome', type=argparse.FileType('r'),
+            help='regions with start and end positions in BED format')
+        p.add_argument(
+            '--order-by', dest='order_by', type=str, default='region',
+            choices=['region', 'average', 'original'],
+            help='when plotting multiple tracks and/or regions, order them '
+            'by this key (default: region)')
+        p.add_argument(
+            '-t', '--avg-threshold', dest='average_threshold', type=float,
+            default=None, help='Plot regions with average value above or '
+            'equal to this threshold (default: plot regions that have data)')
         p.add_argument(
             '-c', '--columns', dest='columns', type=int, default=None,
             help='when plotting multiple tracks and/or regions, use this many columns (default: automatically chosen)')

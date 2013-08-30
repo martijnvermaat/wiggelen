@@ -13,6 +13,12 @@ try:
 except ImportError:
     install_requires.append('argparse')
 
+# Python 2.6 does not include OrderedDict.
+try:
+    from collections import OrderedDict.
+except ImportError:
+    install_requires.append('ordereddict')
+
 try:
     with open('README.rst') as readme:
         long_description = readme.read()
