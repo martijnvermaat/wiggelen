@@ -50,8 +50,8 @@ standard fields such as `sum`.
 """
 
 
-import sys
 from collections import defaultdict, namedtuple
+import sys
 
 from .parse import LineType, create_state, parse
 
@@ -86,7 +86,8 @@ class ReadError(Exception):
 def _cast(field, value, fields=None):
     fields = fields or []
     casters = defaultdict(lambda: str,
-                          start=int, stop=int, sum=float, count=int)
+                          start=int, stop=int, sum=float, min=float,
+                          posmin=float, max=float, count=int)
     casters.update(dict((field.name, field.caster) for field in fields))
     return casters[field](value)
 
@@ -217,6 +218,9 @@ def index(track=sys.stdin, force=False, fields=None):
                     'start':  0,
                     'stop':   track.tell(),
                     'sum':    0,
+                    'min':    sys.float_info.max,
+                    'posmin': sys.float_info.max,
+                    'max':    0,
                     'count':  0}}
     idx['_all'].update(dict((field.name, field.init) for field in fields))
 
@@ -235,6 +239,9 @@ def index(track=sys.stdin, force=False, fields=None):
                 'start':  track.tell() - len(line),
                 'stop':   track.tell(),
                 'sum':    0,
+                'min':    sys.float_info.max,
+                'posmin': sys.float_info.max,
+                'max':    0,
                 'count':  0}
             idx[region].update(dict((field.name, field.init)
                                     for field in fields))
@@ -242,6 +249,10 @@ def index(track=sys.stdin, force=False, fields=None):
             for r in region, '_all':
                 idx[r]['stop'] = track.tell()
                 idx[r]['sum'] += data.value * data.span
+                idx[r]['min'] = min(data.value, idx[r]['min'])
+                if data.value > 0:
+                    idx[r]['posmin'] = min(data.value, idx[r]['posmin'])
+                idx[r]['max'] = max(data.value, idx[r]['max'])
                 idx[r]['count'] += data.span
                 for field in fields:
                     idx[r][field.name] = field.func(idx[r][field.name],

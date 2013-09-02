@@ -330,6 +330,9 @@ def write(walker, track=sys.stdout, serializer=str, name=None,
                 'start':  size,
                 'stop':   size + len(line),
                 'sum':    0,
+                'min':    sys.float_info.max,
+                'posmin': sys.float_info.max,
+                'max':    0,
                 'count':  0}
             size += len(line)
             current_region = region
@@ -337,6 +340,10 @@ def write(walker, track=sys.stdout, serializer=str, name=None,
         track.write(line)
         idx[region]['stop'] = size + len(line)
         idx[region]['sum'] += value
+        idx[region]['min'] = min(value, idx[region]['min'])
+        if value > 0:
+            idx[region]['posmin'] = min(value, idx[region]['posmin'])
+        idx[region]['max'] = max(value, idx[region]['max'])
         idx[region]['count'] += 1
         size += len(line)
 
@@ -345,6 +352,9 @@ def write(walker, track=sys.stdout, serializer=str, name=None,
         'start':  0,
         'stop':   size,
         'sum':    sum(r['sum'] for r in idx.values()),
+        'min':    min(r['min'] for r in idx.values()),
+        'posmin': min(r['posmin'] for r in idx.values()),
+        'max':    max(r['max'] for r in idx.values()),
         'count':  sum(r['count'] for r in idx.values())}
 
     write_index(idx, track)
