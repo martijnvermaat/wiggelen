@@ -7,7 +7,7 @@ Here you can see the full list of changes between each Wiggelen release.
 Version 0.2.0
 -------------
 
-Release date to be decided.
+Released on September 2nd 2013.
 
 - Auto scale tracks in distance calculation if needed (the metrics in
   `wiggelen.distance` are not defined on the (0, 1) interval).
