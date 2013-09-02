@@ -17,7 +17,8 @@ Metric ``c``: :math:`\\frac{\\text{max}(x, y) \, |x - y|}{(x^2 + 1) (y^2 + 1)}`
 
 Metric ``d``: :math:`\\frac{|x - y|}{\\text{max}(x, y) + 1}`
 
-.. note:: These metrics are ill-defined on the interval (0, 1).
+.. note:: These metrics are ill-defined on the interval (0, 1) so we scale all
+       values if necessary.
 
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 .. moduleauthor:: Jeroen Laros <j.f.j.laros@lumc.nl>
@@ -30,6 +31,7 @@ from __future__ import division
 
 from collections import defaultdict
 import itertools
+import sys
 
 from .wiggle import walk
 from .index import Field, index
@@ -137,17 +139,33 @@ def distance(*tracks, **options):
     comparisons = []
 
     if threshold:
-        field_name = 'sum-threshold-%s' % str(threshold)
+        field_suffix = '-threshold-%s' % str(threshold)
         noise_filter = lambda value: max(value - threshold, 0)
-        func = lambda acc, value, span: acc + noise_filter(value) * span
-        fields = [Field(field_name, float, 0, func)]
+        def sum_func(acc, value, span):
+            return acc + noise_filter(value) * span
+        def min_func(acc, value, span):
+            filtered = noise_filter(value)
+            if filtered > 0:
+                return min(acc, noise_filter(value))
+            return acc
+        fields = [Field('sum' + field_suffix, float, 0, sum_func),
+                  Field('posmin' + field_suffix, float, sys.float_info.max,
+                        min_func)]
     else:
-        field_name = 'sum'
+        field_suffix = ''
         noise_filter = lambda value: value
         fields = []
 
-    sums = [index(track, force=True, fields=fields)[0]['_all'][field_name]
-            for track in tracks]
+    summaries = [index(track, force=True, fields=fields)[0]['_all']
+                 for track in tracks]
+
+    # Our metrics are undifined on the (0, 1) interval, so if the positive
+    # minimum over all tracks is < 1 we upscale everything.
+    min_value = min(summary['posmin' + field_suffix] for summary in summaries)
+    scale = 1 / min_value if 0 < min_value < 1 else 1
+
+    # Based on the sums of all values in each track we define weights.
+    sums = [summary['sum' + field_suffix] for summary in summaries]
     for left, right in matrix(len(tracks)):
         weight_right, weight_left = normalize(sums[left], sums[right])
         comparisons.append( (left, right, weight_left, weight_right) )
@@ -160,8 +178,10 @@ def distance(*tracks, **options):
             if value_left is None and value_right is None:
                 result = None
             else:
-                x = weight_left * noise_filter(value_left) if value_left else 0
-                y = weight_right * noise_filter(value_right) if value_right else 0
+                x = (weight_left * scale * noise_filter(value_left)
+                     if value_left else 0)
+                y = (weight_right * scale * noise_filter(value_right)
+                     if value_right else 0)
                 result = metric(x, y) if x or y else None
             results[left, right] = result
         return results
