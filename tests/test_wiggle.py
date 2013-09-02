@@ -264,3 +264,17 @@ class TestWiggle(object):
         e_c = [('c', 1, 1)] + list(filled('c', 3, 8, [4, 7])) + [('c', 10, 10)]
         expected = list(chain(e_a, e_b, e_c))
         assert_equal(list(wiggelen.fill(walker, regions={'b': (1, 10), 'c': (3, 8)})), expected)
+
+    def test_fill_only_edges(self):
+        """
+        Test filling edges of undefined positions.
+        """
+        walker = sparse('a', [3, 5, 6, 14])
+        expected = [('a', 3, 3),
+                    ('a', 4, None),
+                    ('a', 5, 5),
+                    ('a', 6, 6),
+                    ('a', 7, None),
+                    ('a', 13, None),
+                    ('a', 14, 14)]
+        assert_equal(list(wiggelen.fill(walker, only_edges=True)), expected)
