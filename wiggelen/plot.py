@@ -17,9 +17,11 @@ import math
 
 from matplotlib import pyplot
 
+from .wiggle import fill
+
 
 def plot(walker, regions=None, order_by='region', average_threshold=None,
-         columns=None):
+         columns=None, line=True):
     """
     Visualize a wiggle track in a plot.
 
@@ -45,6 +47,9 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
     :arg columns: Number of columns to use in subplot arrangement. If `None`,
         a suitable number of columns is chosen automatically.
     :type columns: int
+    :arg line: Connect values to create a lineplot. Undefined positions are
+        assumed to be `0`.
+    :type line: bool
 
     :return: A tuple containing a matplotlib figure object, a list of
         subplots, the number of rows and the number of columns.
@@ -56,6 +61,9 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
     """
     fig = pyplot.figure(tight_layout=True)
     subplots = collections.OrderedDict()
+
+    if line:
+        walker = fill(walker, regions=regions, filler=0, only_edges=True)
 
     for region, w in itertools.groupby(walker, lambda (r, p, v): r):
         if regions is not None:
@@ -76,7 +84,10 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
         # Temporarily add the subplot at location 111, we'll change that
         # once we know how many subplots there are.
         ax = fig.add_subplot(111, label=region)
-        ax.plot(positions, values, color='b', linestyle='None', marker=',')
+        if line:
+            ax.plot(positions, values, color='b')
+        else:
+            ax.plot(positions, values, color='b', linestyle='None', marker=',')
         ax.plot([start, stop], [average, average], color='r', linestyle='--')
         ax.set_xlim(start, stop)
         ax.set_title(region)
