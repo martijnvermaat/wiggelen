@@ -9,6 +9,10 @@ Version 0.2.0
 
 Release date to be decided.
 
+- Auto scale tracks in distance calculation if needed (the metrics in
+  `wiggelen.distance` are not defined on the (0, 1) interval).
+- Add min,posmin,max fields to track index.
+- Optionally consider edges in `wiggelen.fill` (`only_edges` argument).
 - Introduce the `plot` module for visualizing tracks.
 - Rename command line ``visualize`` function to ``plot``.
 
