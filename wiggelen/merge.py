@@ -20,8 +20,9 @@ values).
 Merger ``div``: Divide the second value by the first (and use 0 for
 undefined values). Only defined on exactly two values.
 
-Merger ``intersect``: Return the first value is the second value is defined and
-non-zero (and use 0 for undefined values). Only defined on exactly two values.
+Merger ``intersect``: Return the first value is the second value is defined
+and non-zero (and use 0 for undefined values). Only defined on exactly two
+values.
 
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 .. moduleauthor:: Jeroen F.J. Laros <J.F.J.Laros@lumc.nl>
