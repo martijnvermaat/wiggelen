@@ -11,6 +11,7 @@ Release date to be decided.
 
 - New merger functions `min`, `div`, and `intersect` (thanks Jeroen F.J.
   Laros).
+- Discard `None` values when writing.
 
 
 Version 0.2.0
