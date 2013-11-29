@@ -9,6 +9,8 @@ Version 0.2.1
 
 Release date to be decided.
 
+- Discard `None` values when writing.
+
 
 Version 0.2.0
 -------------

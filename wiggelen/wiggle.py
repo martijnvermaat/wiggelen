@@ -292,6 +292,8 @@ def write(walker, track=sys.stdout, serializer=str, name=None,
         the UCSC Genome Browser).
     :type description: str
 
+    .. note:: Values of `None` are discarded.
+
     Example::
 
        >>> write(walk(open('a.wig')), name='My example')
@@ -322,6 +324,8 @@ def write(walker, track=sys.stdout, serializer=str, name=None,
     current_region = None
 
     for region, position, value in walker:
+        if value is None:
+            continue
         if region != current_region:
             line = 'variableStep chrom=%s\n' % region
             track.write(line)
