@@ -2,9 +2,9 @@
 Calculate the distance between two wiggle tracks using a metric designed for
 multisets.
 
-This module implements the algorithm from the
-`wiggledist <https://humgenprojects.lumc.nl/trac/wiggledist/>`_ program, an
-efficient tool to assess similarity of next generation sequencing datasets.
+This module can be used to assess similarity of next generation sequencing
+datasets. A multiset distance measure is used for pairwise comparison of
+genomic information as provided by wiggle tracks.
 
 The algorithm can be parameterized by a pairwise distance metric. Four of
 these metrics are predefined in :attr:`metrics`:
