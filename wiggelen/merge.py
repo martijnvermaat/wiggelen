@@ -24,6 +24,9 @@ Merger ``intersect``: Return the first value is the second value is defined
 and non-zero (and use 0 for undefined values). Only defined on exactly two
 values.
 
+Merger ``ctz``: Select the value closest to 0. (and use 0 if there is a mix of
+positive and negative values).
+
 .. moduleauthor:: Martijn Vermaat <martijn@vermaat.name>
 .. moduleauthor:: Jeroen F.J. Laros <J.F.J.Laros@lumc.nl>
 
@@ -59,6 +62,25 @@ _merger_div = lambda vs: (vs[0] or 0) / (vs[1] or 1)
 # undefined values).
 _merger_intersect = lambda vs: (vs[0] or 0) if vs[1] else 0
 
+def _merger_ctz(vs):
+    """
+    Select the value closest to 0. (and use 0 if there is a mix of positive and
+    negative values).
+
+    :arg vs: List of integer or None values.
+    :type vs: list
+    """
+    minimum = min(vs)
+    if minimum >= 0:
+        return minimum
+
+    maximum = max(vs)
+    if maximum <= 0:
+        return maximum
+
+    return 0
+
+
 #: Predefined mergers. See :mod:`wiggelen.merge` for their definition.
 mergers = {'sum':       _merger_sum,
            'mean':      _merger_mean,
@@ -66,7 +88,8 @@ mergers = {'sum':       _merger_sum,
            'minus':     _merger_minus,
            'min':       _merger_min,
            'div':       _merger_div,
-           'intersect': _merger_intersect}
+           'intersect': _merger_intersect,
+           'ctz':       _merger_ctz}
 
 
 def merge(*walkers, **options):
