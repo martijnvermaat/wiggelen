@@ -11,7 +11,7 @@ you'll just find a quick dump of the command line help output below.
 
     martijn@hue:~$ wiggelen -h
     usage: wiggelen [-h]
-                    {index,sort,scale,derivative,plot,coverage,merge,distance} ...
+                    {index,sort,scale,fill,derivative,plot,coverage,merge,distance} ...
 
     Wiggelen command line interface.
 
@@ -24,6 +24,7 @@ you'll just find a quick dump of the command line help output below.
         index               build index for wiggle track
         sort                sort wiggle track regions alphabetically
         scale               scale values in a wiggle track
+        fill                fill undefined positions in a wiggle track
         derivative          create derivative of a wiggle track
         plot                visualize wiggle tracks in a plot (requires
                             matplotlib)

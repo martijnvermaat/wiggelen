@@ -12,7 +12,7 @@ from __future__ import division
 import argparse
 import sys
 
-from .wiggle import walk, write
+from .wiggle import fill, walk, write
 from .index import index, write_index
 from .merge import merge, mergers
 from .distance import metrics, distance
@@ -90,6 +90,27 @@ def scale_track(track, factor=0.1, name=None, description=None):
 
     scale = lambda (r, p, v): (r, p, v * factor)
     write(map_(scale, walk(track)), name=name, description=description)
+
+
+def fill_track(track, genome=None, filler='0', only_edges=False, name=None,
+               description=None):
+    """
+    Fill in undefined positions in a wiggle track.
+    """
+    if name is None and hasattr(track, 'name'):
+        name = 'Filled %s' % track.name
+
+    if genome is not None:
+        genome = read_regions(genome)
+
+    try:
+        filler = float(filler) if '.' in filler else int(filler)
+    except ValueError:
+        abort('Could not parse filler value: %s' % filler)
+
+    write(fill(walk(track),
+               regions=genome, filler=filler, only_edges=only_edges),
+          name=name, description=description)
 
 
 def derivative_track(track, method='forward', step=None, auto_step=False,
@@ -256,6 +277,35 @@ def main():
     p.add_argument(
         '-f', '--factor', dest='factor', type=float, default=0.1,
         help='scaling factor to use (default: %(default)s)')
+    p.add_argument(
+        '-n', '--name', dest='name', type=str,
+        help='name to use for result track, displayed to the left of the '
+        'track in the UCSC Genome Browser (default: Sorted TRACK)')
+    p.add_argument(
+        '-d', '--description', dest='description', type=str,
+        help='description to use for result track, displayed as center label '
+        'in the UCSC Genome Browser (default: no description)')
+
+    p = subparsers.add_parser(
+        'fill', help='fill undefined positions in a wiggle track',
+        description=fill_track.__doc__.split('\n\n')[0],
+        epilog='Note that the resulting track may be very large if '
+        '--only-edges is not specified.')
+    p.set_defaults(func=fill_track)
+    p.add_argument(
+        'track', metavar='TRACK', type=argparse.FileType('r'),
+        help='wiggle track')
+    p.add_argument(
+        '-g', '--genome', dest='genome', type=argparse.FileType('r'),
+        help='regions in BED format to fill (if not specified, first and '
+        'last defined positions in the track define the regions)')
+    p.add_argument(
+        '-f', '--filler', dest='filler', default='0',
+        help='value to use for undefined positions (default: %(default)s)')
+    p.add_argument(
+        '-e', '--only-edges', dest='only_edges', action='store_true',
+        help='only fill the first and last of continuously undefined '
+        'positions')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
         help='name to use for result track, displayed to the left of the '

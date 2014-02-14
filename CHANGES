@@ -4,10 +4,16 @@ Changelog
 Here you can see the full list of changes between each Wiggelen release.
 
 
-Version 0.3.1
+Version 0.4.0
 -------------
 
 Release date to be decided.
+
+- Command line interface to `wiggelen.fill`.
+- Fix off-by-one error in reading genome file argument in `wiggelen plot`
+  command.
+- New merger functions `ctz` (*c*losest *t*o *z*ero), and `max` (thanks Jeroen
+  F.J. Laros).
 
 
 Version 0.3.0
