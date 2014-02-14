@@ -57,7 +57,7 @@ def read_regions(regions):
         if line.startswith('track'):
             continue
         region, start, stop = line.strip().split('\t')[:3]
-        result[region] = int(start), int(stop)
+        result[region] = int(start) + 1, int(stop)
     return result
 
 
