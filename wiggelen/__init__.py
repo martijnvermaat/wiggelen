@@ -28,8 +28,8 @@ from .wiggle import ReadError, walk, zip_, fill, write
 # [2] http://semver.org/
 
 
-__version_info__ = ('0', '3', '1', 'dev')
-__date__ = '29 Nov 2013'
+__version_info__ = ('0', '4', '0')
+__date__ = '17 Feb 2014'
 
 
 __version__ = '.'.join(__version_info__)

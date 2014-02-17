@@ -7,7 +7,7 @@ Here you can see the full list of changes between each Wiggelen release.
 Version 0.4.0
 -------------
 
-Release date to be decided.
+Released on February 17th 2014.
 
 - Command line interface to `wiggelen.fill`.
 - Fix off-by-one error in reading genome file argument in `wiggelen plot`
