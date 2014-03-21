@@ -12,6 +12,8 @@ from __future__ import division
 import argparse
 import sys
 
+from math import *
+
 from .wiggle import fill, walk, write
 from .index import index, write_index
 from .merge import merge, mergers
@@ -197,17 +199,22 @@ def coverage_track(track, threshold=None, name=None, description=None):
                     description=description)
 
 
-def merge_tracks(tracks, merger='sum', no_indices=False, name=None,
-                 description=None):
+def merge_tracks(tracks, merger='sum', function='', no_indices=False,
+        name=None, description=None):
     """
     Merge any number of wiggle tracks in various ways.
     """
     if name is None and all(hasattr(track, 'name') for track in tracks):
         name = 'Merge of %s' % ', '.join(track.name for track in tracks)
 
+    if function:
+        merge_function = lambda vs: eval(function)
+    else:
+        merge_function = mergers[merger]
+
     walkers = [walk(track, force_index=not no_indices)
                for track in tracks]
-    write(merge(*walkers, merger=mergers[merger]), name=name,
+    write(merge(*walkers, merger=merge_function), name=name,
           description=description)
 
 
@@ -413,6 +420,9 @@ def main():
     p.add_argument(
         '-m', dest='merger', choices=mergers, default='sum',
         help='merge operation to use (default: %(default)s)')
+    p.add_argument(
+        '-f', dest='function', type=str, default='',
+        help='cusrom merge function to (default: "%(default)s")')
     p.add_argument(
         '-x', '--no-indices', dest='no_indices', action='store_true',
         help='assume tracks are sorted, don\'t force building indices')
