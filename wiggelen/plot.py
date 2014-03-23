@@ -21,7 +21,7 @@ from .wiggle import fill
 
 
 def plot(walker, regions=None, order_by='region', average_threshold=None,
-         sharey=False, columns=None, line=True):
+         sharey=False, ylim=None, columns=None, line=True):
     """
     Visualize a wiggle track in a plot.
 
@@ -46,6 +46,8 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
     :type average_threshold: float
     :arg sharey: Share y-axes in subplot arrangement.
     :type sharey: bool
+    :arg ylim: Set the y-limits of all subplots.
+    :type ylim: tuple(float)
     :arg columns: Number of columns to use in subplot arrangement. If `None`,
         a suitable number of columns is chosen automatically.
     :type columns: int
@@ -95,6 +97,8 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
             ax.plot(positions, values, color='b', linestyle='None', marker=',')
         ax.plot([start, stop], [average, average], color='r', linestyle='--')
         ax.set_xlim(start, stop)
+        if ylim:
+            ax.set_ylim(ylim)
         ax.set_title(region)
         ax.legend([], title='avg=%.2f' % average, loc='best')
         subplots[region] = average, ax
