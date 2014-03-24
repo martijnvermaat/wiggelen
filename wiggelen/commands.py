@@ -371,7 +371,7 @@ def main():
         p.add_argument(
             '-s', '--share-y', dest='sharey', action='store_true',
             help='when plotting multiple tracks and/or regions, share their '
-            'Y axes')
+            'y-axes')
         p.add_argument(
             '-c', '--columns', dest='columns', type=int, default=None,
             help='when plotting multiple tracks and/or regions, use this '

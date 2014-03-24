@@ -44,7 +44,7 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
         value above or equal to this threshold. If `None`, only include those
         regions with data.
     :type average_threshold: float
-    :arg sharey: Share Y axes in subplot arrangement.
+    :arg sharey: Share y-axes in subplot arrangement.
     :type sharey: bool
     :arg columns: Number of columns to use in subplot arrangement. If `None`,
         a suitable number of columns is chosen automatically.
