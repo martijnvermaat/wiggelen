@@ -328,7 +328,8 @@ def main():
         help='type of divided difference method to use (default: %(default)s)')
     p.add_argument(
         '-s', '--step', dest='step', type=int, default=None,
-        help='restrict to positions that are this far apart (default: no restriction)')
+        help='restrict to positions that are this far apart (default: no '
+        'restriction)')
     p.add_argument(
         '-a', '--auto-step', dest='auto_step', action='store_true',
         help='automatically set STEP to a value based on the first two '
@@ -352,8 +353,9 @@ def main():
             'tracks', metavar='TRACK', type=argparse.FileType('r'), nargs='+',
             help='wiggle track')
         p.add_argument(
-            '-r', '--regions', dest='regions', type=str, default=None, nargs='+',
-            help='plot only these regions (default: plot all regions with data)')
+            '-r', '--regions', dest='regions', type=str, default=None,
+            nargs='+', help='plot only these regions (default: plot all '
+            'regions with data)')
         p.add_argument(
             '-g', '--genome', dest='genome', type=argparse.FileType('r'),
             help='regions with start and end positions in BED format')
@@ -368,11 +370,12 @@ def main():
             'equal to this threshold (default: plot regions that have data)')
         p.add_argument(
             '-s', '--share-y', dest='sharey', action='store_true',
-            help='when plotting multiple tracks and/or regions, share their Y '
-            'axes')
+            help='when plotting multiple tracks and/or regions, share their '
+            'Y axes')
         p.add_argument(
             '-c', '--columns', dest='columns', type=int, default=None,
-            help='when plotting multiple tracks and/or regions, use this many columns (default: automatically chosen)')
+            help='when plotting multiple tracks and/or regions, use this '
+            'many columns (default: automatically chosen)')
         p.add_argument(
             '-o', '--output', dest='pdf', type=argparse.FileType('wb'),
             default=None, help='output PDF file')
