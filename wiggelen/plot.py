@@ -21,7 +21,7 @@ from .wiggle import fill
 
 
 def plot(walker, regions=None, order_by='region', average_threshold=None,
-         columns=None, line=True):
+         sharey=False, columns=None, line=True):
     """
     Visualize a wiggle track in a plot.
 
@@ -44,6 +44,8 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
         value above or equal to this threshold. If `None`, only include those
         regions with data.
     :type average_threshold: float
+    :arg sharey: Share Y axes in subplot arrangement.
+    :type sharey: bool
     :arg columns: Number of columns to use in subplot arrangement. If `None`,
         a suitable number of columns is chosen automatically.
     :type columns: int
@@ -65,6 +67,9 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
     if line:
         walker = fill(walker, regions=regions, filler=0, only_edges=True)
 
+    # Keep track of the last added subplot for sharing the Y axis.
+    ax = None
+
     for region, w in itertools.groupby(walker, lambda (r, p, v): r):
         if regions is not None:
             try:
@@ -83,7 +88,7 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
 
         # Temporarily add the subplot at location 111, we'll change that
         # once we know how many subplots there are.
-        ax = fig.add_subplot(111, label=region)
+        ax = fig.add_subplot(111, label=region, sharey=ax if sharey else None)
         if line:
             ax.plot(positions, values, color='b')
         else:
@@ -99,7 +104,8 @@ def plot(walker, regions=None, order_by='region', average_threshold=None,
     if average_threshold == 0:
         for region in regions:
             if region not in subplots:
-                ax = fig.add_subplot(111, label=region)
+                ax = fig.add_subplot(111, label=region,
+                                     sharey=ax if sharey else None)
                 ax.set_xlim(*regions[region])
                 ax.set_title(region)
                 ax.text(0.5, 0.5, 'no data', ha='center', va='center',

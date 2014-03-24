@@ -135,7 +135,7 @@ def derivative_track(track, method='forward', step=None, auto_step=False,
 
 
 def plot_tracks(tracks, regions=None, genome=None, order_by='region',
-                average_threshold=None, columns=None, pdf=None):
+                average_threshold=None, sharey=False, columns=None, pdf=None):
     """
     Visualize wiggle tracks in a plot.
     """
@@ -169,7 +169,7 @@ def plot_tracks(tracks, regions=None, genome=None, order_by='region',
 
     fig, axes, rows, columns = plot(
         walker, regions=genome, order_by=order_by,
-        average_threshold=average_threshold, columns=columns)
+        average_threshold=average_threshold, sharey=sharey, columns=columns)
 
     if pdf:
         fig.set_size_inches(6 * columns, 3 * rows)
@@ -366,6 +366,10 @@ def main():
             '-t', '--avg-threshold', dest='average_threshold', type=float,
             default=None, help='Plot regions with average value above or '
             'equal to this threshold (default: plot regions that have data)')
+        p.add_argument(
+            '-s', '--share-y', dest='sharey', action='store_true',
+            help='when plotting multiple tracks and/or regions, share their Y '
+            'axes')
         p.add_argument(
             '-c', '--columns', dest='columns', type=int, default=None,
             help='when plotting multiple tracks and/or regions, use this many columns (default: automatically chosen)')
