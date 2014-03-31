@@ -15,7 +15,7 @@ import re
 import sys
 
 from .wiggle import fill, walk, write
-from .index import index, write_index
+from .index import index
 from .merge import merge, mergers
 from .distance import metrics, distance
 from .transform import (backward_divided_difference,
@@ -232,9 +232,11 @@ def distance_tracks(tracks, metric='a', threshold=None):
     """
     # Todo: Cleanup this code.
     distances = distance(*tracks, metric=metrics[metric],
-                          threshold=threshold)
+                         threshold=threshold)
+
     def name(index):
         return chr(ord('A') + index)
+
     try:
         sys.stdout.write(''.join('%s: %s\n' % (name(i), track.name)
                                  for i, track in enumerate(tracks)))

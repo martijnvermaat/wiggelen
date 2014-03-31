@@ -36,8 +36,8 @@ def create_state():
 
 
 def parse(line, state):
-    # Parse a line and return a tuple (line_type, data). The state dictionary is
-    # modified and should be passed as such with the next call.
+    # Parse a line and return a tuple (line_type, data). The state dictionary
+    # is modified and should be passed as such with the next call.
 
     # As an optimization, we first check for the common case of a line with
     # data. It must always start with a number (either position or value).
@@ -63,8 +63,8 @@ def parse(line, state):
             except ValueError:
                 raise ParseError('Could not parse line: %s' % line)
 
-    if line[:7] == 'browser' or line[:5] == 'track' \
-           or line[0] == '#' or line in ('\n', '\r\n', '\r'):
+    if (line[:7] == 'browser' or line[:5] == 'track' or line[0] == '#' or
+        line in ('\n', '\r\n', '\r')):
         # As far as I can see empty lines and comments are not allowed
         # by the spec, but I guess they exist in the real world.
         return LineType.NONE, None

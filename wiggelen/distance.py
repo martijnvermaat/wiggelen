@@ -39,11 +39,11 @@ from .merge import merge
 
 
 # Todo: Give these metrics a name.
-_metric_a = lambda x, y : abs(x - y) / ((x + 1) * (y + 1))
-_metric_b = lambda x, y : abs(x - y) / (x + y + 1)
-_metric_c = lambda x, y : (max(x, y) * abs(x - y)) \
-                          / (((x * x) + 1) * ((y * y) + 1))
-_metric_d = lambda x, y : abs(x - y) / (max(x, y) + 1)
+_metric_a = lambda x, y: abs(x - y) / ((x + 1) * (y + 1))
+_metric_b = lambda x, y: abs(x - y) / (x + y + 1)
+_metric_c = lambda x, y: ((max(x, y) * abs(x - y))
+                          / (((x * x) + 1) * ((y * y) + 1)))
+_metric_d = lambda x, y: abs(x - y) / (max(x, y) + 1)
 
 
 #: Predefined pairwise distance metrics. See :mod:`wiggelen.distance` for
@@ -141,16 +141,20 @@ def distance(*tracks, **options):
     if threshold:
         field_suffix = '-threshold-%s' % str(threshold)
         noise_filter = lambda value: max(value - threshold, 0)
+
         def sum_func(acc, value, span):
             return acc + noise_filter(value) * span
+
         def min_func(acc, value, span):
             filtered = noise_filter(value)
             if filtered > 0:
                 return min(acc, noise_filter(value))
             return acc
+
         fields = [Field('sum' + field_suffix, float, 0, sum_func),
                   Field('posmin' + field_suffix, float, sys.float_info.max,
                         min_func)]
+
     else:
         field_suffix = ''
         noise_filter = lambda value: value
