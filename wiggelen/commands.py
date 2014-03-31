@@ -10,9 +10,9 @@ Wiggelen command line interface.
 from __future__ import division
 
 import argparse
+import importlib
+import re
 import sys
-
-from math import *
 
 from .wiggle import fill, walk, write
 from .index import index, write_index
@@ -199,16 +199,24 @@ def coverage_track(track, threshold=None, name=None, description=None):
                     description=description)
 
 
-def merge_tracks(tracks, merger='sum', function='', no_indices=False,
-        name=None, description=None):
+def merge_tracks(tracks, merger='sum', custom_merger=None, no_indices=False,
+                 name=None, description=None):
     """
     Merge any number of wiggle tracks in various ways.
     """
     if name is None and all(hasattr(track, 'name') for track in tracks):
         name = 'Merge of %s' % ', '.join(track.name for track in tracks)
 
-    if function:
-        merge_function = lambda vs: eval(function)
+    if custom_merger:
+        # http://docs.python.org/2/reference/lexical_analysis.html#identifiers
+        if re.match('[_a-zA-Z][_a-zA-Z0-9]*(\.[_a-zA-Z][_a-zA-Z0-9]*)+$',
+                    custom_merger):
+            # Importable definition, e.g. `package.module.merge_function`.
+            module, name = custom_merger.rsplit('.', 1)
+            merge_function = getattr(importlib.import_module(module), name)
+        else:
+            # Expression over `values`, e.g. `max(values)`.
+            merge_function = eval('lambda values: ' + custom_merger)
     else:
         merge_function = mergers[merger]
 
@@ -418,11 +426,14 @@ def main():
         description=merge_tracks.__doc__.split('\n\n')[0])
     p.set_defaults(func=merge_tracks)
     p.add_argument(
-        '-m', dest='merger', choices=mergers, default='sum',
-        help='merge operation to use (default: %(default)s)')
+        '-m', '--merger', dest='merger', choices=mergers, default='sum',
+        help='merge operation (default: %(default)s)')
     p.add_argument(
-        '-f', dest='function', type=str, default='',
-        help='cusrom merge function to (default: "%(default)s")')
+        '-c', '--custom-merger', dest='custom_merger',
+        help='custom Python merge operation, specified either by an '
+        'expression over the list "values" (e.g., "max(values)"), or an '
+        'importable name (e.g., "package.module.merger") that can be called '
+        'with a list as argument')
     p.add_argument(
         '-x', '--no-indices', dest='no_indices', action='store_true',
         help='assume tracks are sorted, don\'t force building indices')
