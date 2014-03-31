@@ -343,15 +343,16 @@ def main():
         '-m', '--method', dest='method', type=str, default='forward',
         choices=('forward', 'backward', 'central'),
         help='type of divided difference method to use (default: %(default)s)')
-    p.add_argument(
+    g = p.add_mutually_exclusive_group()
+    g.add_argument(
         '-s', '--step', dest='step', type=int, default=None,
         help='restrict to positions that are this far apart (default: no '
         'restriction)')
-    p.add_argument(
+    g.add_argument(
         '-a', '--auto-step', dest='auto_step', action='store_true',
         help='automatically set STEP to a value based on the first two '
-        'positions in TRACK (only used if STEP is omitted, always set if '
-        'METHOD is central)')
+        'positions in TRACK (default if METHOD is central and STEP is '
+        'omitted)')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
         help='name to use for result track, displayed to the left of the '
@@ -385,11 +386,12 @@ def main():
             '-t', '--avg-threshold', dest='average_threshold', type=float,
             default=None, help='Plot regions with average value above or '
             'equal to this threshold (default: plot regions that have data)')
-        p.add_argument(
+        g = p.add_mutually_exclusive_group()
+        g.add_argument(
             '-s', '--share-y', dest='sharey', action='store_true',
             help='when plotting multiple tracks and/or regions, share their '
             'y-axes')
-        p.add_argument(
+        g.add_argument(
             '-y', '--y-lim', metavar=('MIN', 'MAX'), dest='ylim', nargs=2,
             type=float, help='set y-axis limits (default: automatically '
             'chosen)')
@@ -425,10 +427,11 @@ def main():
         'merge', help='merge any number of wiggle tracks in various ways',
         description=merge_tracks.__doc__.split('\n\n')[0])
     p.set_defaults(func=merge_tracks)
-    p.add_argument(
+    g = p.add_mutually_exclusive_group()
+    g.add_argument(
         '-m', '--merger', dest='merger', choices=mergers, default='sum',
         help='merge operation (default: %(default)s)')
-    p.add_argument(
+    g.add_argument(
         '-c', '--custom-merger', dest='custom_merger',
         help='custom Python merge operation, specified either by an '
         'expression over the list "values" (e.g., "max(values)"), or an '
