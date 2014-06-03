@@ -9,6 +9,12 @@ Version 0.4.1
 
 Release date to be decided.
 
+- New ``--share-y`` and ``--y-lim`` options for ``wiggelen plot`` command.
+- Command line or importable definition of custom merge function for
+  ``wiggelen merge`` command.
+- Optionally only report posititions in regions defined by the ``--genome``
+  argument for ``wiggelen fill`` command.
+
 
 Version 0.4.0
 -------------
@@ -16,7 +22,7 @@ Version 0.4.0
 Released on February 17th 2014.
 
 - Command line interface to `wiggelen.fill`.
-- Fix off-by-one error in reading genome file argument in `wiggelen plot`
+- Fix off-by-one error in reading genome file argument in ``wiggelen plot``
   command.
 - New merger functions `ctz` (*c*losest *t*o *z*ero), and `max` (thanks Jeroen
   F.J. Laros).
