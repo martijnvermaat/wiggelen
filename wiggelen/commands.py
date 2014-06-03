@@ -94,24 +94,39 @@ def scale_track(track, factor=0.1, name=None, description=None):
     write(map_(scale, walk(track)), name=name, description=description)
 
 
-def fill_track(track, genome=None, filler='0', only_edges=False, name=None,
-               description=None):
+def fill_track(track, genome=None, filler='0', only_edges=False,
+               only_genome=False, name=None, description=None):
     """
     Fill in undefined positions in a wiggle track.
     """
     if name is None and hasattr(track, 'name'):
         name = 'Filled %s' % track.name
 
+    walker = walk(track)
+
     if genome is not None:
         genome = read_regions(genome)
+
+        if only_genome:
+            # Todo: This is a bit of a hack to keep only positions defined by
+            #   the genome. We might want to generalize this for use in other
+            #   functions and to multiple definitions per region (currently,
+            #   the genome definition can have only one definition per
+            #   region).
+            def in_genome((region, position, value)):
+                try:
+                    start, stop = genome[region]
+                    return start <= position <= stop
+                except KeyError:
+                    return False
+            walker = filter_(in_genome, walker)
 
     try:
         filler = float(filler) if '.' in filler else int(filler)
     except ValueError:
         abort('Could not parse filler value: %s' % filler)
 
-    write(fill(walk(track),
-               regions=genome, filler=filler, only_edges=only_edges),
+    write(fill(walker, regions=genome, filler=filler, only_edges=only_edges),
           name=name, description=description)
 
 
@@ -325,6 +340,9 @@ def main():
         '-e', '--only-edges', dest='only_edges', action='store_true',
         help='only fill the first and last of continuously undefined '
         'positions')
+    p.add_argument(
+        '-o', '--only-genome', dest='only_genome', action='store_true',
+        help='only report positions in regions defined by the GENOME file')
     p.add_argument(
         '-n', '--name', dest='name', type=str,
         help='name to use for result track, displayed to the left of the '
