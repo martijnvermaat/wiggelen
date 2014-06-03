@@ -92,6 +92,12 @@ grepping the source code for ``Todo``.
 * Option to specify region(s) to use from a track, in that order.
 * Beter unit tests coverage.
 * Profile code to identify what's keeping us from doing stuff fast.
+* Fill optionally takes a BED file of regions to fill, but it will only
+  consider one entry per chromosome (and this is not clearly
+  documented). There may also be other cases where a dictionary of
+  `chromosome->(start, stop)` is used where we perhaps want to generalize to
+  `chromosome->list(start, stop)` (or `list(chromosome, start, stop)`, or an
+  OrderedMultiDict).
 
 
 .. _nose: https://nose.readthedocs.org/
