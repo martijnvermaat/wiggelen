@@ -7,7 +7,7 @@ Here you can see the full list of changes between each Wiggelen release.
 Version 0.4.1
 -------------
 
-Release date to be decided.
+Released on May 3rd 2014.
 
 - New ``--share-y`` and ``--y-lim`` options for ``wiggelen plot`` command.
 - Command line or importable definition of custom merge function for
