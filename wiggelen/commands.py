@@ -431,7 +431,7 @@ def main():
         'track', metavar='TRACK', type=argparse.FileType('r'),
         help='wiggle track')
     p.add_argument(
-        '-t', '--threshold', dest='threshold', type=int, default=None,
+        '-t', '--threshold', dest='threshold', type=float, default=None,
         help='only include positions with this value or higher (default: no '
         'threshold)')
     p.add_argument(

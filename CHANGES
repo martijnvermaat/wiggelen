@@ -9,6 +9,8 @@ Version 0.4.2
 
 Release date to be decided.
 
+- Accept float threshold in ``wiggelen coverage`` command line interface.
+
 
 Version 0.4.1
 -------------
