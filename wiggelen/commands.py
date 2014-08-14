@@ -169,10 +169,10 @@ def plot_tracks(tracks, regions=None, genome=None, order_by='region',
     if genome is not None:
         # Read genome from BED track and filter by specified regions. If we
         # have more than one track, have a region copy per track.
-        genome = {rename(r, track, i): v
-                  for r, v in read_regions(genome).items()
-                  for i, track in enumerate(tracks)
-                  if regions is None or r in regions}
+        genome = dict((rename(r, track, i), v)
+                      for r, v in read_regions(genome).items()
+                      for i, track in enumerate(tracks)
+                      if regions is None or r in regions)
 
     # Filter by specified regions.
     def filtered(walker):
@@ -491,8 +491,8 @@ def main():
     args = parser.parse_args()
 
     try:
-        args.func(**{k: v for k, v in vars(args).items()
-                     if k not in ('func', 'subcommand')})
+        args.func(**dict((k, v) for k, v in vars(args).items()
+                         if k not in ('func', 'subcommand')))
     except IOError as e:
         abort(str(e))
 
