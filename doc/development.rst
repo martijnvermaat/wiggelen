@@ -98,6 +98,7 @@ grepping the source code for ``Todo``.
   `chromosome->(start, stop)` is used where we perhaps want to generalize to
   `chromosome->list(start, stop)` (or `list(chromosome, start, stop)`, or an
   OrderedMultiDict).
+* Use flake8 (and automatically run it with the unit tests and/or with tox).
 
 
 .. _nose: https://nose.readthedocs.org/
