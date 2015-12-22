@@ -11,7 +11,5 @@ python:
   - "nightly"
   - "pypy"
   - "pypy3"
-install:
-  - "if [[ $TRAVIS_PYTHON_VERSION == '2.6' ]]; then pip install --use-mirrors argparse ordereddict; fi"
-  - python setup.py install
+install: python setup.py install
 script: nosetests
